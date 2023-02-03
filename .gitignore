@@ -2,7 +2,6 @@
 /build
 .env
 .eslintcache
-/lib
 /node_modules
 /tmp
 
