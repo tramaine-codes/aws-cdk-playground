@@ -1,13 +1,10 @@
 /coverage
-/dist
+/build
 .env
 .eslintcache
 /lib
 /node_modules
 /tmp
-
-*.js
-*.d.ts
 
 log*
 npm-debug.log*
