@@ -1,6 +1,6 @@
 /cdk.out
 /coverage
-/dist
+/build
 /.husky
 /node_modules
 /tmp
