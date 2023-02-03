@@ -1,19 +1,37 @@
 {
   "name": "aws-cdk-playground",
   "version": "0.1.0",
+  "type": "module",
   "bin": {
     "aws-cdk-playground": "bin/aws-cdk-playground.js"
   },
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w",
+    "cdk": "cdk",
+    "clean": "del-cli lib coverage",
+    "format": "prettier . --write",
+    "lint": "eslint . --ext .js,.ts",
+    "lint:fix": "eslint . --ext .js,.ts --fix",
+    "prepack": "npm run build",
+    "prepare": "husky install",
+    "release": "release-it --ci",
     "test": "vitest run",
-    "cdk": "cdk"
+    "test:cov": "vitest run --coverage",
+    "test:watch": "vitest",
+    "watch": "tsc -w"
   },
   "devDependencies": {
+    "@commitlint/cli": "17.4.2",
+    "@commitlint/config-conventional": "17.4.2",
+    "@release-it/conventional-changelog": "5.1.1",
     "@types/node": "18.11.18",
+    "@typescript-eslint/eslint-plugin": "5.50.0",
     "@vitest/coverage-c8": "0.28.3",
     "aws-cdk": "2.63.0",
+    "del-cli": "5.0.0",
+    "husky": "8.0.3",
+    "lint-staged": "13.1.0",
+    "release-it": "15.6.0",
     "tsx": "3.12.2",
     "typescript": "4.9.4",
     "vitest": "0.28.3"
