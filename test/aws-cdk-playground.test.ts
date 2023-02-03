@@ -1,6 +1,7 @@
 // import * as cdk from 'aws-cdk-lib';
 // import { Template } from 'aws-cdk-lib/assertions';
 // import * as AwsCdkPlayground from '../lib/aws-cdk-playground-stack';
+import { test } from 'vitest';
 
 // example test. To run these tests, uncomment this file along with the
 // example resource in lib/aws-cdk-playground-stack.ts
