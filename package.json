@@ -21,15 +21,15 @@
     "watch": "tsc -w"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.4.2",
-    "@commitlint/config-conventional": "17.4.2",
+    "@commitlint/cli": "17.4.3",
+    "@commitlint/config-conventional": "17.4.3",
     "@release-it/conventional-changelog": "5.1.1",
     "@types/node": "18.13.0",
     "@typescript-eslint/eslint-plugin": "5.51.0",
     "@vitest/coverage-c8": "0.28.4",
     "aws-cdk": "2.64.0",
     "del-cli": "5.0.0",
-    "eslint": "8.33.0",
+    "eslint": "8.34.0",
     "husky": "8.0.3",
     "lint-staged": "13.1.1",
     "prettier": "2.8.4",
@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "aws-cdk-lib": "2.64.0",
-    "constructs": "10.1.245",
+    "constructs": "10.1.249",
     "source-map-support": "0.5.21"
   }
 }
