@@ -1,8 +1,9 @@
 {
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnPaste": true,
   "editor.formatOnSave": true,
-  "javascript.suggestionActions.enabled": false,
-  "typescript.suggestionActions.enabled": false,
   "typescript.tsdk": "./node_modules/typescript/lib"
 }
