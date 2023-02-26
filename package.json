@@ -30,7 +30,7 @@
     "@vitest/coverage-c8": "0.29.1",
     "aws-cdk": "2.66.1",
     "del-cli": "5.0.0",
-    "eslint": "8.34.0",
+    "eslint": "8.35.0",
     "husky": "8.0.3",
     "lint-staged": "13.1.2",
     "prettier": "2.8.4",
@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "aws-cdk-lib": "2.66.1",
-    "constructs": "10.1.260",
+    "constructs": "10.1.261",
     "source-map-support": "0.5.21"
   }
 }
