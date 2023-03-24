@@ -1,9 +1,14 @@
 #!/usr/bin/env node
-import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { AwsCdkPlaygroundStack } from '../lib/aws-cdk-playground-stack.js';
+import 'source-map-support/register';
+import { ApiGatewayStack } from '../lib/api-gateway-stack.js';
+import { CodeBuildStack } from '../lib/code-build-stack.js';
+import { CodePipelineStack } from '../lib/code-pipeline-stack.js';
+import { LambdaStack } from '../lib/lambda-stack.js';
 
-new AwsCdkPlaygroundStack(new cdk.App(), 'AwsCdkPlaygroundStack', {
+const app = new cdk.App();
+
+new ApiGatewayStack(app, 'ApiGatewayStack', {
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */
@@ -15,3 +20,9 @@ new AwsCdkPlaygroundStack(new cdk.App(), 'AwsCdkPlaygroundStack', {
   // env: { account: '123456789012', region: 'us-east-1' },
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
+
+new CodeBuildStack(app, 'CodeBuildStack');
+
+const { lambdaCode } = new LambdaStack(app, 'LambdaStack');
+
+new CodePipelineStack(app, 'CodePipelineStack', lambdaCode);
