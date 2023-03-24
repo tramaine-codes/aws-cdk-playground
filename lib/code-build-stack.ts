@@ -9,7 +9,7 @@ export class CodeBuildStack extends cdk.Stack {
 
     const gitHubSource = codebuild.Source.gitHub({
       owner: 'tgillus',
-      repo: 'chemist',
+      repo: 'geo-api',
       webhook: true,
       webhookFilters: [
         codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs(
@@ -41,9 +41,9 @@ export class CodeBuildStack extends cdk.Stack {
           build: {
             commands: [
               'echo Building project',
-              'npm run build:ci',
+              'npm run build',
               'echo Pruning development dependencies',
-              'npm prune --production',
+              'npm prune --omit=dev',
             ],
           },
         },

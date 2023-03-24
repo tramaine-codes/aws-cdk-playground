@@ -3,8 +3,7 @@ import * as cdk from 'aws-cdk-lib';
 import 'source-map-support/register';
 import { ApiGatewayStack } from '../lib/api-gateway-stack.js';
 import { CodeBuildStack } from '../lib/code-build-stack.js';
-import { CodePipelineStack } from '../lib/code-pipeline-stack.js';
-import { LambdaStack } from '../lib/lambda-stack.js';
+import { CodePipelineStack, LambdaStack } from '../lib/code-pipeline-stack.js';
 
 const app = new cdk.App();
 
