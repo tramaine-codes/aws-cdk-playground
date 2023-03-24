@@ -49,6 +49,7 @@ export class CodeBuildStack extends cdk.Stack {
         },
         artifacts: {
           files: ['lib/**/*', 'package.json', 'node_modules/**/*'],
+          name: 'geo-api-$(npm pkg get version | tr -d \\").zip',
         },
       }),
       environment: {
@@ -57,9 +58,8 @@ export class CodeBuildStack extends cdk.Stack {
       source: gitHubSource,
       artifacts: codebuild.Artifacts.s3({
         bucket,
-        name: 'chemist.zip',
         packageZip: true,
-        path: 'chemist',
+        path: 'geo-api',
       }),
     });
   }
