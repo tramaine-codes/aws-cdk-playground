@@ -49,7 +49,7 @@ export class CodeBuildStack extends cdk.Stack {
         },
         artifacts: {
           files: ['lib/**/*', 'package.json', 'node_modules/**/*'],
-          name: 'geo-api-$(npm pkg get version | tr -d \\").zip',
+          name: 'geo-api-$(npm pkg get version | tr -d \\").${CODEBUILD_BUILD_NUMBER}.zip',
         },
       }),
       environment: {
