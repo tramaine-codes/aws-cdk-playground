@@ -7,22 +7,23 @@ export class CodeBuildStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const gitHubSource = codebuild.Source.gitHub({
-      owner: 'tgillus',
-      repo: 'geo-api',
-      webhook: true,
-      webhookFilters: [
-        codebuild.FilterGroup.inEventOf(codebuild.EventAction.PUSH).andBranchIs(
-          'main'
-        ),
-      ],
-    });
-    const bucket = new s3.Bucket(this, 'Bucket');
-
     new codebuild.GitHubSourceCredentials(this, 'GitHubToken', {
       accessToken: cdk.SecretValue.secretsManager('github-token'),
     });
     new codebuild.Project(this, 'Project', {
+      source: codebuild.Source.gitHub({
+        owner: 'tgillus',
+        repo: 'geo-api',
+        webhook: true,
+        webhookFilters: [
+          codebuild.FilterGroup.inEventOf(
+            codebuild.EventAction.PUSH
+          ).andBranchIs('main'),
+        ],
+      }),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_4,
+      },
       buildSpec: codebuild.BuildSpec.fromObjectToYaml({
         version: 0.2,
         phases: {
@@ -30,21 +31,16 @@ export class CodeBuildStack extends cdk.Stack {
             'runtime-versions': {
               nodejs: 16,
             },
-            commands: [
-              'echo Installing latest version of npm',
-              'npm install -g npm@latest',
-            ],
+            commands: ['npm install -g npm@latest'],
           },
           pre_build: {
-            commands: ['echo Installing project dependencies', 'npm install'],
+            commands: ['npm install'],
           },
           build: {
-            commands: [
-              'echo Building project',
-              'npm run build',
-              'echo Pruning development dependencies',
-              'npm prune --omit=dev',
-            ],
+            commands: ['npm run build'],
+          },
+          post_build: {
+            commands: ['npm prune --omit=dev'],
           },
         },
         artifacts: {
@@ -52,12 +48,11 @@ export class CodeBuildStack extends cdk.Stack {
           name: 'geo-api-$(npm pkg get version | tr -d \\").${CODEBUILD_BUILD_NUMBER}.zip',
         },
       }),
-      environment: {
-        buildImage: codebuild.LinuxBuildImage.STANDARD_6_0,
-      },
-      source: gitHubSource,
       artifacts: codebuild.Artifacts.s3({
-        bucket,
+        bucket: new s3.Bucket(this, 'ArtifactsBucket', {
+          autoDeleteObjects: true,
+          removalPolicy: cdk.RemovalPolicy.DESTROY,
+        }),
         includeBuildId: false,
         packageZip: true,
         path: 'geo-api',
