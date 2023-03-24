@@ -60,7 +60,7 @@ export class CodePipelineStack extends cdk.Stack {
             },
           },
           artifacts: {
-            files: 'LambdaStack.template.yaml',
+            files: 'LambdaStack.template.json',
           },
         }),
       }
