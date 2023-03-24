@@ -27,7 +27,7 @@ export class CodePipelineStack extends cdk.Stack {
     });
     const lambdaSourceOutput = new codepipeline.Artifact();
     const lambdaSourceAction = new codepipeline_actions.GitHubSourceAction({
-      actionName: 'GitHubSourceAction',
+      actionName: 'LambdaSourceAction',
       owner: 'tgillus',
       repo: 'geo-api',
       oauthToken: cdk.SecretValue.secretsManager('github-token'),
@@ -128,7 +128,7 @@ export class CodePipelineStack extends cdk.Stack {
       actions: [
         new codepipeline_actions.CloudFormationCreateUpdateStackAction({
           actionName: 'LambdaCfnDeploy',
-          templatePath: cdkBuildOutput.atPath('LambdaStack.template.yaml'),
+          templatePath: cdkBuildOutput.atPath('LambdaStack.template.json'),
           stackName: 'LambdaStack',
           adminPermissions: true,
           parameterOverrides: lambdaCode.assign(lambdaBuildOutput.s3Location),
