@@ -58,6 +58,7 @@ export class CodeBuildStack extends cdk.Stack {
       source: gitHubSource,
       artifacts: codebuild.Artifacts.s3({
         bucket,
+        includeBuildId: false,
         packageZip: true,
         path: 'geo-api',
       }),
