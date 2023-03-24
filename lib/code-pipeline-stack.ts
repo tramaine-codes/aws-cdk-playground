@@ -127,7 +127,7 @@ export class CodePipelineStack extends cdk.Stack {
       stageName: 'Deploy',
       actions: [
         new codepipeline_actions.CloudFormationCreateUpdateStackAction({
-          actionName: 'LambdaCfnDeploy',
+          actionName: 'LambdaCfnDeployAction',
           templatePath: cdkBuildOutput.atPath('LambdaStack.template.json'),
           stackName: 'LambdaStack',
           adminPermissions: true,
