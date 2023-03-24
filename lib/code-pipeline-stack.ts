@@ -95,7 +95,7 @@ export class CodePipelineStack extends cdk.Stack {
             build: {
               commands: [
                 'echo Building project',
-                'npm run build:ci',
+                'npm run build',
                 'echo Pruning development dependencies',
                 'npm prune --omit=dev',
               ],
