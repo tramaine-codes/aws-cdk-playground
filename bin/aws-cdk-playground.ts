@@ -19,5 +19,4 @@ new ApiGatewayStack(app, 'ApiGatewayStack', { env });
 new CodeBuildStack(app, 'CodeBuildStack', { env });
 
 const { lambdaCode } = new LambdaStack(app, 'LambdaStack', { env });
-
 new CodePipelineStack(app, 'CodePipelineStack', lambdaCode, { env });
