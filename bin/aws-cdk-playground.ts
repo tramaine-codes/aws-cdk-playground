@@ -7,6 +7,7 @@ import {
   CodePipelineStack,
   LambdaStack,
 } from '../lib/code-pipeline/code-pipeline-stack.js';
+import { EcsStack } from '../lib/ecs/ecs-stack.js';
 
 const app = new cdk.App();
 const env = {
@@ -20,3 +21,5 @@ new CodeBuildStack(app, 'CodeBuildStack', { env });
 
 const { lambdaCode } = new LambdaStack(app, 'LambdaStack', { env });
 new CodePipelineStack(app, 'CodePipelineStack', lambdaCode, { env });
+
+new EcsStack(app, 'EcsStack', { env });
