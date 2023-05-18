@@ -24,10 +24,10 @@
     "@commitlint/cli": "17.6.3",
     "@commitlint/config-conventional": "17.6.3",
     "@release-it/conventional-changelog": "5.1.1",
-    "@types/node": "20.1.5",
+    "@types/node": "20.2.0",
     "@typescript-eslint/eslint-plugin": "5.59.6",
     "@typescript-eslint/parser": "5.59.6",
-    "@vitest/coverage-c8": "0.31.0",
+    "@vitest/coverage-c8": "0.31.1",
     "aws-cdk": "2.79.1",
     "del-cli": "5.0.0",
     "eslint": "8.40.0",
@@ -37,11 +37,11 @@
     "release-it": "15.10.3",
     "tsx": "3.12.7",
     "typescript": "5.0.4",
-    "vitest": "0.31.0"
+    "vitest": "0.31.1"
   },
   "dependencies": {
     "aws-cdk-lib": "2.79.1",
-    "constructs": "10.2.25",
+    "constructs": "10.2.27",
     "source-map-support": "0.5.21"
   }
 }
