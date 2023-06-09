@@ -28,7 +28,7 @@
     "@typescript-eslint/eslint-plugin": "5.59.9",
     "@typescript-eslint/parser": "5.59.9",
     "@vitest/coverage-c8": "0.32.0",
-    "aws-cdk": "2.82.0",
+    "aws-cdk": "2.83.1",
     "del-cli": "5.0.0",
     "eslint": "8.42.0",
     "husky": "8.0.3",
@@ -40,8 +40,8 @@
     "vitest": "0.32.0"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.82.0",
-    "constructs": "10.2.45",
+    "aws-cdk-lib": "2.83.1",
+    "constructs": "10.2.47",
     "source-map-support": "0.5.21"
   }
 }
