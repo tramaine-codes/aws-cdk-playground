@@ -11,7 +11,6 @@ export class EcsStack extends cdk.Stack {
     const vpc = new ec2.Vpc(this, 'Vpc', {
       maxAzs: 3,
     });
-
     const cluster = new ecs.Cluster(this, 'Cluster', {
       vpc,
     });

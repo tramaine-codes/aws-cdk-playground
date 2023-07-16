@@ -1,8 +1,8 @@
+/build
+bulk-movies.json
 /cdk.out
 /coverage
-/build
 /.husky
 /node_modules
-/tmp
-
 package-lock.json
+/tmp

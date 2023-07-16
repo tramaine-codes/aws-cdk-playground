@@ -8,6 +8,7 @@ import {
   LambdaStack,
 } from '../lib/code-pipeline/code-pipeline-stack.js';
 import { EcsStack } from '../lib/ecs/ecs-stack.js';
+import { OpenSearchStack } from '../lib/open-search/open-search-stack.js';
 
 const app = new cdk.App();
 const env = {
@@ -23,3 +24,5 @@ const { lambdaCode } = new LambdaStack(app, 'LambdaStack', { env });
 new CodePipelineStack(app, 'CodePipelineStack', lambdaCode, { env });
 
 new EcsStack(app, 'EcsStack', { env });
+
+new OpenSearchStack(app, 'OpenSearchStack', { env });
