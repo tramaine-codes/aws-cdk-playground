@@ -1,3 +1,27 @@
-curl -XPUT -u 'master-user:<password>' 'https://search-domain66ac69e0-nmlcfb8vhtzm-xcnycnwzv7idzxoa5n4z7vwy7e.us-east-1.es.amazonaws.com/movies/_doc/1' -d '{ "director": "Burton, Tim", "genre": ["Comedy", "Sci-Fi"], "year": 1996, "actor": ["Jack Nicholson", "Pierce Brosnan", "Sarah Jessica Parker"], "title": "Mars Attacks!" }' -H 'Content-Type: application/json'
-curl -XPOST -u 'master-user:<password>' 'https://search-domain66ac69e0-nmlcfb8vhtzm-xcnycnwzv7idzxoa5n4z7vwy7e.us-east-1.es.amazonaws.com/_bulk' --data-binary @bulk-movies.json -H 'Content-Type: application/json'
-curl -XGET -u 'master-user:<password>' 'https://search-domain66ac69e0-nmlcfb8vhtzm-xcnycnwzv7idzxoa5n4z7vwy7e.us-east-1.es.amazonaws.com/movies/_search?q=mars&pretty=true'
+curl -XPUT -u 'master-user:<password>' '<domain>/movies/_doc/1' -d '{ "director": "Burton, Tim", "genre": ["Comedy", "Sci-Fi"], "year": 1996, "actor": ["Jack Nicholson", "Pierce Brosnan", "Sarah Jessica Parker"], "title": "Mars Attacks!" }' -H 'Content-Type: application/json'
+curl -XPOST -u 'master-user:<password>' '<domain>/_bulk' --data-binary @bulk-movies.json -H 'Content-Type: application/json'
+curl -XGET -u 'master-user:<password>' '<domain>/movies/_search?q=mars&pretty=true'
+
+PUT _plugins/_security/api/rolesmapping/readall_and_monitor
+{
+  "users" : [ "arn:aws:iam::102551228732:user/tgillus" ]
+}
+
+PUT _plugins/_security/api/roles/index_mappings_readall
+{
+  "index_permissions": [
+    {
+      "index_patterns": [
+        "*"
+      ],
+      "allowed_actions": [
+        "indices:admin/mappings/get"
+      ]
+    }
+  ]
+}
+
+PUT _plugins/_security/api/rolesmapping/index_mappings_readall
+{
+  "users" : [ "arn:aws:iam::102551228732:user/tgillus" ]
+}
