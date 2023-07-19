@@ -25,3 +25,22 @@ PUT _plugins/_security/api/rolesmapping/index_mappings_readall
 {
   "users" : [ "arn:aws:iam::102551228732:user/tgillus" ]
 }
+
+PUT _plugins/_security/api/roles/indices_full_access
+{
+  "index_permissions": [
+    {
+      "index_patterns": [
+        "*"
+      ],
+      "allowed_actions": [
+        "indices_all"
+      ]
+    }
+  ]
+}
+
+PUT _plugins/_security/api/rolesmapping/indices_full_access
+{
+  "users" : [ "arn:aws:iam::102551228732:user/tgillus" ]
+}
