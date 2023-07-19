@@ -28,13 +28,17 @@ PUT _plugins/_security/api/rolesmapping/index_mappings_readall
 
 PUT _plugins/_security/api/roles/indices_full_access
 {
+  "cluster_permissions": [
+    	"indices:data/write/bulk"
+  ],
   "index_permissions": [
     {
       "index_patterns": [
         "*"
       ],
       "allowed_actions": [
-        "indices_all"
+        "indices_all",
+        "indices:data/write/bulk",
       ]
     }
   ]
