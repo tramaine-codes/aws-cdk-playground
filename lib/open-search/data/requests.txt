@@ -48,3 +48,35 @@ PUT _plugins/_security/api/rolesmapping/indices_full_access
 {
   "users" : [ "arn:aws:iam::102551228732:user/tgillus" ]
 }
+
+GET pay_periods/_search
+{
+  "query": {
+    "query_string": {
+      "query": "sequence: >=10 AND startDate: [* TO 2023-05-21]"
+    }
+  },
+  "sort": [
+    {
+      "startDate": {
+        "order": "asc"
+      }
+    }
+  ]
+}
+
+GET pay_periods/_search
+{
+  "query": {
+    "query_string": {
+      "query": "current: true"
+    }
+  },
+  "sort": [
+    {
+      "startDate": {
+        "order": "asc"
+      }
+    }
+  ]
+}
