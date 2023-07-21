@@ -79,4 +79,5 @@ export class SecuritySettings {
 }
 
 const settings = new SecuritySettings(Environment.load());
-await settings.setup();
+// eslint-disable-next-line no-console
+console.log(await settings.setup());
