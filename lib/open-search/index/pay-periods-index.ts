@@ -197,14 +197,15 @@ export class PayPeriodsIndex {
     );
   };
 
-  private aliases = () =>
-    EitherAsync(() =>
+  private aliases = () => {
+    return EitherAsync(() =>
       this.client.cat.aliases<AliasesResponse>({
         name: PayPeriodsIndex.ALIAS,
         h: 'alias,index',
         format: 'json',
       })
     ).map(({ body }) => body);
+  };
 
   private updateAlias = (aliases: AliasesResponse) => {
     const removes = aliases.map(({ index, alias }) => ({
@@ -231,14 +232,15 @@ export class PayPeriodsIndex {
     );
   };
 
-  private indices = () =>
-    EitherAsync(() =>
+  private indices = () => {
+    return EitherAsync(() =>
       this.client.cat.indices<IndicesResponse>({
         index: `${PayPeriodsIndex.ALIAS}_2*`,
         h: 'index',
         format: 'json',
       })
     ).map(({ body }) => body.map(({ index }) => index));
+  };
 
   private cleanupIndices = (indices: readonly string[]) => {
     const sortedDesc: readonly string[] = [...indices].sort().reverse();

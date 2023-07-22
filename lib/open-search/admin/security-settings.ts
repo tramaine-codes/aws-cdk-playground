@@ -22,27 +22,35 @@ export class SecuritySettings {
     });
   }
 
-  setup = () => {
+  setup = () =>
+    this.updateReadAllCusterMonitorRole()
+      .chain(this.addReadAllIndexMappingsRole)
+      .chain(this.addIndicesFullAccessRole);
+
+  private updateReadAllCusterMonitorRole = () => {
     return EitherAsync(() =>
       this.request('_plugins/_security/api/rolesmapping/readall_and_monitor', {
         json: {
           users: [this.awsIamUser],
         },
-      })
-    )
-      .map(() =>
-        this.request('_plugins/_security/api/roles/index_mappings_readall', {
-          json: {
-            index_permissions: [
-              {
-                index_patterns: ['*'],
-                allowed_actions: ['indices:admin/mappings/get'],
-              },
-            ],
-          },
-        }).json()
-      )
-      .map(() =>
+      }).json()
+    );
+  };
+
+  private addReadAllIndexMappingsRole = () => {
+    return EitherAsync(() =>
+      this.request('_plugins/_security/api/roles/index_mappings_readall', {
+        json: {
+          index_permissions: [
+            {
+              index_patterns: ['*'],
+              allowed_actions: ['indices:admin/mappings/get'],
+            },
+          ],
+        },
+      }).json()
+    ).chain(() =>
+      EitherAsync(() =>
         this.request(
           '_plugins/_security/api/rolesmapping/index_mappings_readall',
           {
@@ -52,20 +60,24 @@ export class SecuritySettings {
           }
         ).json()
       )
-      .map(() =>
-        this.request('_plugins/_security/api/roles/indices_full_access', {
-          json: {
-            cluster_permissions: ['indices:data/write/bulk'],
-            index_permissions: [
-              {
-                index_patterns: ['*'],
-                allowed_actions: ['indices_all', 'indices:data/write/bulk'],
-              },
-            ],
-          },
-        }).json()
-      )
-      .map(() =>
+    );
+  };
+
+  private addIndicesFullAccessRole = () => {
+    return EitherAsync(() =>
+      this.request('_plugins/_security/api/roles/indices_full_access', {
+        json: {
+          cluster_permissions: ['indices:data/write/bulk'],
+          index_permissions: [
+            {
+              index_patterns: ['*'],
+              allowed_actions: ['indices_all', 'indices:data/write/bulk'],
+            },
+          ],
+        },
+      }).json()
+    ).chain(() =>
+      EitherAsync(() =>
         this.request(
           '_plugins/_security/api/rolesmapping/indices_full_access',
           {
@@ -74,7 +86,8 @@ export class SecuritySettings {
             },
           }
         ).json()
-      );
+      )
+    );
   };
 }
 
