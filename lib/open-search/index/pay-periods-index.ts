@@ -3,74 +3,73 @@ import { Client } from '@opensearch-project/opensearch';
 import { AwsSigv4Signer } from '@opensearch-project/opensearch/aws';
 import { format } from 'date-fns';
 import 'dotenv/config';
-import { EitherAsync, Left, Right, identity } from 'purify-ts';
-import { match } from 'ts-pattern';
+import { EitherAsync, List, identity } from 'purify-ts';
 import { Environment } from '../../infrastructure/environment/environment.js';
 
+interface Alias {
+  readonly alias: string;
+  readonly index: string;
+}
+type AliasesResponse = readonly Alias[];
+type IndicesResponse = readonly { readonly index: string }[];
+
 export class PayPeriodsIndex {
-  constructor(private readonly client: Client) {}
+  private static readonly ALIAS = 'pay_periods';
+
+  private readonly index: string;
+
+  constructor(private readonly client: Client) {
+    this.index = `${PayPeriodsIndex.ALIAS}_${Time.now()}`;
+  }
 
   setup = () => {
-    return this.create().chain(this.load).caseOf({
-      Left: identity,
-      Right: identity,
-    });
-  };
-
-  private create = () => {
-    return EitherAsync(() =>
-      this.client.indices.exists({
-        index: 'pay_periods',
-      })
-    )
-      .chain(({ statusCode }) =>
-        EitherAsync.liftEither(
-          match(statusCode)
-            .with(200, () => Left(undefined))
-            .otherwise(() => Right(undefined))
-        )
-      )
-      .chain(() => {
-        const index = `pay_periods_${format(Date.now(), 'yyyyMMddHHmmssSS')}`;
-
-        return EitherAsync(() =>
-          this.client.indices.create({
-            index,
-            body: {
-              settings: {
-                index: {
-                  number_of_shards: 1,
-                  number_of_replicas: 1,
-                },
-              },
-              mappings: {
-                properties: {
-                  current: {
-                    type: 'boolean',
-                  },
-                  endDate: {
-                    type: 'date',
-                    format: 'strict_year_month_day',
-                  },
-                  sequence: {
-                    type: 'integer',
-                  },
-                  startDate: {
-                    type: 'date',
-                    format: 'strict_year_month_day',
-                  },
-                },
-              },
-              aliases: {
-                pay_periods: {},
-              },
-            },
-          })
-        );
+    return this.createIndex()
+      .chain(this.loadIndex)
+      .chain(this.aliases)
+      .chain(this.updateAlias)
+      .chain(this.indices)
+      .chain(this.cleanupIndices)
+      .caseOf({
+        Left: identity,
+        Right: identity,
       });
   };
 
-  private load = () => {
+  private createIndex = () => {
+    return EitherAsync(() =>
+      this.client.indices.create({
+        index: this.index,
+        body: {
+          settings: {
+            index: {
+              number_of_shards: 1,
+              number_of_replicas: 1,
+            },
+          },
+          mappings: {
+            properties: {
+              current: {
+                type: 'boolean',
+              },
+              endDate: {
+                type: 'date',
+                format: 'strict_year_month_day',
+              },
+              sequence: {
+                type: 'integer',
+              },
+              startDate: {
+                type: 'date',
+                format: 'strict_year_month_day',
+              },
+            },
+          },
+        },
+      })
+    );
+  };
+
+  private loadIndex = () => {
     return EitherAsync(() =>
       this.client.helpers.bulk({
         datasource: [
@@ -196,9 +195,70 @@ export class PayPeriodsIndex {
           },
         ],
         onDocument: () => {
-          return { index: { _index: 'pay_periods' } };
+          return { index: { _index: this.index } };
         },
       })
+    );
+  };
+
+  private aliases = () =>
+    EitherAsync(() =>
+      this.client.cat.aliases<AliasesResponse>({
+        name: PayPeriodsIndex.ALIAS,
+        h: 'alias,index',
+        format: 'json',
+      })
+    ).map(({ body }) => body);
+
+  private updateAlias = (aliases: AliasesResponse) => {
+    const removes = aliases.map(({ index, alias }) => ({
+      remove: {
+        index,
+        alias,
+      },
+    }));
+
+    return EitherAsync(() =>
+      this.client.indices.updateAliases({
+        body: {
+          actions: [
+            ...removes,
+            {
+              add: {
+                index: this.index,
+                alias: PayPeriodsIndex.ALIAS,
+              },
+            },
+          ],
+        },
+      })
+    );
+  };
+
+  private indices = () =>
+    EitherAsync(() =>
+      this.client.cat.indices<IndicesResponse>({
+        index: `${PayPeriodsIndex.ALIAS}_2*`,
+        h: 'index',
+        format: 'json',
+      })
+    ).map(({ body }) => body.map(({ index }) => index));
+
+  private cleanupIndices = (indices: readonly string[]) => {
+    const sortedDesc: readonly string[] = [...indices].sort().reverse();
+    const oldIndices = List.tail(sortedDesc).caseOf({
+      Just: identity,
+      Nothing: () => [],
+    });
+
+    return EitherAsync(() =>
+      Promise.all(
+        oldIndices.map((index) =>
+          this.client.indices.delete({
+            index,
+          })
+        )
+      )
     );
   };
 
@@ -215,6 +275,20 @@ export class PayPeriodsIndex {
         node,
       })
     );
+  }
+}
+
+class Time {
+  now() {
+    return format(Date.now(), 'yyyyMMddHHmmssSS');
+  }
+
+  static now() {
+    return Time.build().now();
+  }
+
+  static build() {
+    return new Time();
   }
 }
 

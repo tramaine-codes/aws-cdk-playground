@@ -6,46 +6,46 @@ import { EitherAsync } from 'purify-ts';
 import { Environment } from '../../infrastructure/environment/environment.js';
 
 interface ShardsResponse {
-  total: number;
-  successful: number;
-  failed: number;
-  skipped: number;
+  readonly total: number;
+  readonly successful: number;
+  readonly failed: number;
+  readonly skipped: number;
 }
 
 interface Explanation {
-  value: number;
-  description: string;
-  details: Explanation[];
+  readonly value: number;
+  readonly description: string;
+  readonly details: Explanation[];
 }
 
 interface SearchResponse<T> {
-  took: number;
-  timed_out: boolean;
-  _scroll_id?: string;
-  _shards: ShardsResponse;
-  hits: {
-    total: number;
-    max_score: number;
-    hits: {
-      _index: string;
-      _type: string;
-      _id: string;
-      _score: number;
-      _source: T;
-      _version?: number;
-      _explanation?: Explanation;
-      fields?: unknown;
-      highlight?: unknown;
-      inner_hits?: unknown;
-      matched_queries?: string[];
-      sort?: string[];
+  readonly took: number;
+  readonly timed_out: boolean;
+  readonly _scroll_id?: string;
+  readonly _shards: ShardsResponse;
+  readonly hits: {
+    readonly total: number;
+    readonly max_score: number;
+    readonly hits: {
+      readonly _index: string;
+      readonly _type: string;
+      readonly _id: string;
+      readonly _score: number;
+      readonly _source: T;
+      readonly _version?: number;
+      readonly _explanation?: Explanation;
+      readonly fields?: unknown;
+      readonly highlight?: unknown;
+      readonly inner_hits?: unknown;
+      readonly matched_queries?: string[];
+      readonly sort?: string[];
     }[];
   };
-  aggregations?: unknown;
+  readonly aggregations?: unknown;
 }
 
 interface Source {
-  current: boolean;
+  readonly current: boolean;
 }
 
 export class OpenSearchGateway {
