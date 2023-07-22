@@ -40,7 +40,7 @@ export class SecuritySettings {
               },
             ],
           },
-        })
+        }).json()
       )
       .map(() =>
         this.request(
@@ -50,7 +50,7 @@ export class SecuritySettings {
               users: [this.awsIamUser],
             },
           }
-        )
+        ).json()
       )
       .map(() =>
         this.request('_plugins/_security/api/roles/indices_full_access', {
@@ -63,7 +63,7 @@ export class SecuritySettings {
               },
             ],
           },
-        })
+        }).json()
       )
       .map(() =>
         this.request(
@@ -73,7 +73,7 @@ export class SecuritySettings {
               users: [this.awsIamUser],
             },
           }
-        )
+        ).json()
       );
   };
 }

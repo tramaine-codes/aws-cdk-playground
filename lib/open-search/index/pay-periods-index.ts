@@ -28,11 +28,7 @@ export class PayPeriodsIndex {
       .chain(this.aliases)
       .chain(this.updateAlias)
       .chain(this.indices)
-      .chain(this.cleanupIndices)
-      .caseOf({
-        Left: identity,
-        Right: identity,
-      });
+      .chain(this.cleanupIndices);
   };
 
   private createIndex = () => {
