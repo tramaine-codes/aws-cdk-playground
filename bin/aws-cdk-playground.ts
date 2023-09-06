@@ -10,6 +10,7 @@ import {
   CodePipelineStack,
   LambdaStack,
 } from '../lib/code-pipeline/code-pipeline-stack.js';
+import { CustomResourceStack } from '../lib/custom-resource/custom-resource-stack.js';
 import { EcsStack } from '../lib/ecs/ecs-stack.js';
 import { Environment } from '../lib/infrastructure/environment/environment.js';
 import { OpenSearchStack } from '../lib/open-search/open-search-stack.js';
@@ -34,3 +35,5 @@ new CodePipelineStack(app, 'CodePipelineStack', lambdaCode, { env });
 new EcsStack(app, 'EcsStack', { env });
 
 new OpenSearchStack(app, 'OpenSearchStack', { env, environment });
+
+new CustomResourceStack(app, 'CustomResourceStack', { env });
