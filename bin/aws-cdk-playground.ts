@@ -14,6 +14,7 @@ import { CustomResourceStack } from '../lib/custom-resource/custom-resource-stac
 import { EcsStack } from '../lib/ecs/ecs-stack.js';
 import { Environment } from '../lib/infrastructure/environment/environment.js';
 import { OpenSearchStack } from '../lib/open-search/open-search-stack.js';
+import { S3Stack } from '../lib/s3/s3-stack.js';
 
 const environment = Environment.load();
 const { awsAccount: account, awsRegion: region } = environment;
@@ -29,11 +30,13 @@ new ApiKeyAuthorizerStack(app, 'ApiKeyAuthorizerStack', { env });
 
 new CodeBuildStack(app, 'CodeBuildStack', { env });
 
-const { lambdaCode } = new LambdaStack(app, 'LambdaStack', { env });
-new CodePipelineStack(app, 'CodePipelineStack', lambdaCode, { env });
+new CustomResourceStack(app, 'CustomResourceStack', { env });
 
 new EcsStack(app, 'EcsStack', { env });
 
+const { lambdaCode } = new LambdaStack(app, 'LambdaStack', { env });
+new CodePipelineStack(app, 'CodePipelineStack', lambdaCode, { env });
+
 new OpenSearchStack(app, 'OpenSearchStack', { env, environment });
 
-new CustomResourceStack(app, 'CustomResourceStack', { env });
+new S3Stack(app, 'S3Stack', { env });
