@@ -51,16 +51,18 @@ export class S3Stack extends cdk.Stack {
       targets: [new targets.SqsQueue(queue)],
     });
 
-    new ec2.Instance(this, 'Instance', {
-      instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.T3,
-        ec2.InstanceSize.NANO
-      ),
-      machineImage: ec2.MachineImage.latestAmazonLinux2(),
-      vpc: new ec2.Vpc(this, 'Vpc', {
-        maxAzs: 1,
-      }),
-    });
+    cdk.Tags.of(
+      new ec2.Instance(this, 'Instance', {
+        instanceType: ec2.InstanceType.of(
+          ec2.InstanceClass.T3,
+          ec2.InstanceSize.NANO
+        ),
+        machineImage: ec2.MachineImage.latestAmazonLinux2(),
+        vpc: new ec2.Vpc(this, 'Vpc', {
+          maxAzs: 1,
+        }),
+      })
+    ).add('Name', 'FooBarBaz');
 
     const fn = new nodejs.NodejsFunction(this, 'Function', {
       entry: `${this.pkg.rootDir()}/lambda/ec2/index.ts`,

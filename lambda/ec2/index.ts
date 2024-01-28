@@ -20,7 +20,20 @@ export const handler = async (
 
   const client = new EC2Client();
 
-  const describeOutput = await client.send(new DescribeInstancesCommand({}));
+  const describeOutput = await client.send(
+    new DescribeInstancesCommand({
+      Filters: [
+        {
+          Name: 'tag:Name',
+          Values: ['FooBarBaz'],
+        },
+        {
+          Name: 'instance-state-name',
+          Values: ['stopped'],
+        },
+      ],
+    })
+  );
   console.log(JSON.stringify(describeOutput, undefined, 2));
 
   const instanceIds = R.pipe(
@@ -31,12 +44,14 @@ export const handler = async (
     R.compact
   );
 
-  const startOutput = await client.send(
-    new StartInstancesCommand({
-      InstanceIds: instanceIds,
-    })
-  );
-  console.log(JSON.stringify(startOutput, undefined, 2));
+  if (instanceIds.length > 0) {
+    const startOutput = await client.send(
+      new StartInstancesCommand({
+        InstanceIds: instanceIds,
+      })
+    );
+    console.log(JSON.stringify(startOutput, undefined, 2));
+  }
 
   return {
     batchItemFailures: [],
