@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as kms from 'aws-cdk-lib/aws-kms';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
@@ -13,8 +14,8 @@ export class ApiTodoStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    new dynamodb.TableV2(this, 'TodoApiTable', {
-      tableName: 'TodoApiTable',
+    const table = new dynamodb.TableV2(this, 'TodoApiTable', {
+      tableName: 'TodoApi',
       partitionKey: { name: 'PK', type: dynamodb.AttributeType.STRING },
       sortKey: { name: 'SK', type: dynamodb.AttributeType.STRING },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
@@ -42,8 +43,12 @@ export class ApiTodoStack extends cdk.Stack {
 
     const integration = new apigw.LambdaIntegration(
       new nodejs.NodejsFunction(this, 'TodoHandler', {
-        entry: `${this.pkg.rootDir()}/lambda/todo/index.ts`,
+        runtime: lambda.Runtime.NODEJS_20_X,
+        entry: `${this.pkg.rootDir()}/lambda/todo-api/index.ts`,
         handler: 'index.handler',
+        environment: {
+          DYNAMODB_TABLE: table.tableName,
+        },
       })
     );
 
