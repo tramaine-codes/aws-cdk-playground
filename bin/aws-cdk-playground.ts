@@ -5,6 +5,7 @@ import 'source-map-support/register';
 import { ApiGatewayStack } from '../lib/api-gateway/api-gateway-stack.js';
 import { ApiKeyAuthorizerStack } from '../lib/api-gateway/api-key-authorizer-stack.js';
 import { ApiKeyStack } from '../lib/api-gateway/api-key-stack.js';
+import { ApiTodoStack } from '../lib/api-gateway/api-todo-stack.js';
 import { CodeBuildStack } from '../lib/code-build/code-build-stack.js';
 import {
   CodePipelineStack,
@@ -27,6 +28,7 @@ const env = {
 new ApiGatewayStack(app, 'ApiGatewayStack', { env });
 new ApiKeyStack(app, 'ApiKeyStack', { env });
 new ApiKeyAuthorizerStack(app, 'ApiKeyAuthorizerStack', { env });
+new ApiTodoStack(app, 'ApiTodoStack', { env });
 
 new CodeBuildStack(app, 'CodeBuildStack', { env });
 
