@@ -41,16 +41,17 @@ export class ApiTodoStack extends cdk.Stack {
       versioned: true,
     });
 
-    const integration = new apigw.LambdaIntegration(
-      new nodejs.NodejsFunction(this, 'TodoHandler', {
-        runtime: lambda.Runtime.NODEJS_20_X,
-        entry: `${this.pkg.rootDir()}/lambda/todo-api/index.ts`,
-        handler: 'index.handler',
-        environment: {
-          DYNAMODB_TABLE: table.tableName,
-        },
-      })
-    );
+    const handler = new nodejs.NodejsFunction(this, 'TodoHandler', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      entry: `${this.pkg.rootDir()}/lambda/todo-api/index.ts`,
+      handler: 'index.handler',
+      environment: {
+        DYNAMODB_TABLE: table.tableName,
+      },
+    });
+    const integration = new apigw.LambdaIntegration(handler);
+
+    table.grantReadWriteData(handler);
 
     const api = new apigw.RestApi(this, 'TodoApi');
     api.root.addMethod('ANY');

@@ -10,18 +10,34 @@ export const handler = async (
   console.log(JSON.stringify(event, undefined, 2));
   console.log(JSON.stringify(process.env, undefined, 2));
 
+  const id = nanoid();
+
   if (event.httpMethod === 'POST') {
-    const client = new DynamoDBClient({
-      region: process.env.AWS_REGION,
+    const documentClient = DynamoDBDocument.from(
+      new DynamoDBClient({
+        region: process.env.AWS_REGION,
+      })
+    );
+    const date = new Date().toISOString();
+    await documentClient.put({
+      TableName: process.env.DYNAMODB_TABLE,
+      Item: {
+        PK: `TODO#${id}`,
+        SK: `TODO#${id}`,
+        Id: id,
+        Type: 'Todo',
+        Completed: false,
+        Text: 'Go grocery shopping',
+        CreatedAt: date,
+        UpdatedAt: date,
+      },
     });
-    const documentClient = DynamoDBDocument.from(client);
-    const id = nanoid();
     console.log('POST request');
   }
 
   return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'text/plain' },
-    body: `Hello, CDK! You've hit ${event.path}\n`,
+    statusCode: 202,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: 'Accepted', id }),
   };
 };
