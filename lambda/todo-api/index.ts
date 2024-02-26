@@ -2,6 +2,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { addMinutes } from 'date-fns';
 import { nanoid } from 'nanoid';
 
 export const handler = async (
@@ -30,6 +31,7 @@ export const handler = async (
         Text: 'Go grocery shopping',
         CreatedAt: date,
         UpdatedAt: date,
+        TTL: addMinutes(date, 2).getTime(),
       },
     });
     console.log('POST request');
