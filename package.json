@@ -54,7 +54,7 @@
     "got": "14.2.0",
     "pkg-dir": "8.0.0",
     "purify-ts": "2.0.3",
-    "remeda": "1.44.0",
+    "remeda": "1.44.1",
     "source-map-support": "0.5.21",
     "ts-pattern": "5.0.8"
   }
