@@ -1,6 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as kms from 'aws-cdk-lib/aws-kms';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
@@ -27,7 +28,8 @@ export class ApiTodoStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
-    new s3.Bucket(this, 'TodoApiBucket', {
+    const bucket = new s3.Bucket(this, 'TodoApiBucket', {
+      autoDeleteObjects: true,
       encryption: s3.BucketEncryption.KMS,
       encryptionKey: key,
       enforceSSL: true,
@@ -40,28 +42,56 @@ export class ApiTodoStack extends cdk.Stack {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       versioned: true,
     });
+    bucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        sid: 'RequireKMSEncryption',
+        effect: iam.Effect.DENY,
+        principals: [new iam.AnyPrincipal()],
+        actions: ['s3:PutObject'],
+        resources: [bucket.arnForObjects('*')],
+        conditions: {
+          StringNotEquals: {
+            's3:x-amz-server-side-encryption': 'aws:kms',
+          },
+        },
+      })
+    );
+    bucket.addToResourcePolicy(
+      new iam.PolicyStatement({
+        sid: 'RequireSpecificKMSKey',
+        effect: iam.Effect.DENY,
+        principals: [new iam.AnyPrincipal()],
+        actions: ['s3:PutObject'],
+        resources: [bucket.arnForObjects('*')],
+        conditions: {
+          StringNotLikeIfExists: {
+            's3:x-amz-server-side-encryption-aws-kms-key-id': key.keyArn,
+          },
+        },
+      })
+    );
 
     const handler = new nodejs.NodejsFunction(this, 'TodoHandler', {
-      runtime: lambda.Runtime.NODEJS_20_X,
       entry: `${this.pkg.rootDir()}/lambda/todo-api/index.ts`,
-      handler: 'index.handler',
       environment: {
         DYNAMODB_TABLE: table.tableName,
+        KMS_KEY: key.keyArn,
+        S3_BUCKET: bucket.bucketName,
       },
+      handler: 'index.handler',
+      runtime: lambda.Runtime.NODEJS_20_X,
     });
     const integration = new apigw.LambdaIntegration(handler);
 
     table.grantReadWriteData(handler);
+    bucket.grantReadWrite(handler);
 
     const api = new apigw.RestApi(this, 'TodoApi');
-    api.root.addMethod('ANY');
 
     const todos = api.root.addResource('todos');
-    todos.addMethod('GET', integration);
     todos.addMethod('POST', integration);
 
     const todo = todos.addResource('{todoId}');
     todo.addMethod('GET', integration);
-    todo.addMethod('DELETE', integration);
   }
 }
