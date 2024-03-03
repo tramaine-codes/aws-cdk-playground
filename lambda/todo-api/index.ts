@@ -1,86 +1,49 @@
 /* eslint-disable no-console */
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import {
-  GetObjectCommand,
-  PutObjectCommand,
-  S3Client,
-} from '@aws-sdk/client-s3';
-import { DynamoDBDocument } from '@aws-sdk/lib-dynamodb';
 import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { addMinutes, getUnixTime } from 'date-fns';
-import { nanoid } from 'nanoid';
+import { match } from 'ts-pattern';
+import { TodoService } from './application/service/todo-service.js';
+import { Config } from './infrastructure/config/config.js';
+import { DynamoGateway } from './infrastructure/dynamo/dynamo-gateway.js';
+import { S3Gateway } from './infrastructure/s3/s3-gateway.js';
 
 export const handler = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
-  if (event.httpMethod === 'POST') {
-    return await post(event);
-  }
+  const todoService = new TodoService(
+    new DynamoGateway(),
+    new S3Gateway(),
+    new Config()
+  );
 
-  return await get(event);
+  return await match(event.httpMethod)
+    .with('POST', () => post(event, todoService))
+    .otherwise(() => get(event, todoService));
 };
 
-const post = async (event: APIGatewayEvent) => {
-  const id = nanoid();
-  const documentClient = DynamoDBDocument.from(new DynamoDBClient());
-  const s3Client = new S3Client();
-  const newTodo = JSON.parse(event.body ?? '{}');
-  const date = new Date().toISOString();
-  await documentClient.put({
-    TableName: process.env.DYNAMODB_TABLE,
-    Item: {
-      PK: `TODO#${id}`,
-      SK: `TODO#${id}`,
-      Id: id,
-      Type: 'Todo',
-      S3Key: `todos/${id}.json`,
-      CreatedAt: date,
-      TTL: getUnixTime(addMinutes(date, 2)),
-    },
+const post = (event: APIGatewayEvent, todoService: TodoService) =>
+  todoService.createTodo(JSON.parse(event.body ?? '{}')).caseOf({
+    Left: () => ({
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'Internal Server Error' }),
+    }),
+    Right: (id) => ({
+      statusCode: 202,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status: 'Accepted' }),
+    }),
   });
 
-  await s3Client.send(
-    new PutObjectCommand({
-      Body: JSON.stringify(newTodo),
-      Bucket: process.env.S3_BUCKET,
-      Key: `todos/${id}.json`,
-      ServerSideEncryption: 'aws:kms',
-      SSEKMSKeyId: process.env.KMS_KEY,
-    })
-  );
-
-  return {
-    statusCode: 202,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: 'Accepted', id }),
-  };
-};
-
-const get = async (event: APIGatewayEvent) => {
-  const documentClient = DynamoDBDocument.from(
-    new DynamoDBClient({
-      region: process.env.AWS_REGION,
-    })
-  );
-  const s3Client = new S3Client();
-  const id = event.pathParameters?.todoId;
-  const { Item } = await documentClient.get({
-    TableName: process.env.DYNAMODB_TABLE,
-    Key: {
-      PK: `TODO#${id}`,
-      SK: `TODO#${id}`,
-    },
+const get = (event: APIGatewayEvent, todoService: TodoService) =>
+  todoService.getTodo(event.pathParameters?.todoId ?? '').caseOf({
+    Left: () => ({
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'Internal Server Error' }),
+    }),
+    Right: (todo) => ({
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ todo, status: 'Processed' }),
+    }),
   });
-  const { Body } = await s3Client.send(
-    new GetObjectCommand({
-      Bucket: process.env.S3_BUCKET,
-      Key: Item?.S3Key,
-    })
-  );
-
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
-    body: (await Body?.transformToString()) ?? '{}',
-  };
-};
