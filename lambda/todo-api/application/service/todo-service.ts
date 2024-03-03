@@ -30,7 +30,7 @@ export class TodoService {
         this.dynamoGateway.put({
           TableName: this.config.aws.dynamo.tableName,
           Item: {
-            PK: `TODO#${id}`,
+            PK: 'TODO',
             SK: `TODO#${id}`,
             Id: id,
             Type: 'Todo',
@@ -43,12 +43,12 @@ export class TodoService {
       .map(() => id);
   }
 
-  getTodo = (id: string) => {
-    return this.dynamoGateway
+  getTodo = (id: string) =>
+    this.dynamoGateway
       .get({
         TableName: this.config.aws.dynamo.tableName,
         Key: {
-          PK: `TODO#${id}`,
+          PK: 'TODO',
           SK: `TODO#${id}`,
         },
       })
@@ -65,33 +65,18 @@ export class TodoService {
         )
       )
       .chain((key) =>
-        this.s3Gateway.get({
+        this.s3Gateway.select({
           Bucket: this.config.aws.s3.bucketName,
           Key: key,
+          ExpressionType: 'SQL',
+          Expression: `SELECT * FROM s3object s WHERE s.id = '${id}'`,
+          InputSerialization: {
+            JSON: { Type: 'DOCUMENT' },
+          },
+          OutputSerialization: {
+            JSON: { RecordDelimiter: '\n' },
+          },
         })
       )
-      .chain(({ Body }) =>
-        EitherAsync.liftEither(
-          Maybe.fromNullable(Body).toEither(new Error('todo not found'))
-        )
-      )
-      .chain((body) =>
-        EitherAsync<Error, string>(() => body.transformToString())
-      );
-  };
-
-  selectTodo = (key: string, id: string) => {
-    return this.s3Gateway.select({
-      Bucket: this.config.aws.s3.bucketName,
-      Key: key,
-      ExpressionType: 'SQL',
-      Expression: `SELECT * FROM s3object s WHERE s.id = ${id}`,
-      InputSerialization: {
-        JSON: { Type: 'DOCUMENT' },
-      },
-      OutputSerialization: {
-        JSON: { RecordDelimiter: '\n' },
-      },
-    });
-  };
+      .map((todo) => JSON.parse(todo) as TodoDto);
 }
