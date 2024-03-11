@@ -1,19 +1,12 @@
-/* eslint-disable no-console */
 import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { match } from 'ts-pattern';
 import { TodoService } from './application/service/todo-service.js';
 import { Config } from './infrastructure/config/config.js';
-import { DynamoGateway } from './infrastructure/dynamo/dynamo-gateway.js';
-import { S3Gateway } from './infrastructure/s3/s3-gateway.js';
 
 export const handler = async (
   event: APIGatewayEvent
 ): Promise<APIGatewayProxyResult> => {
-  const todoService = new TodoService(
-    new DynamoGateway(),
-    new S3Gateway(),
-    new Config()
-  );
+  const todoService = TodoService.from(new Config());
 
   return await match(event.httpMethod)
     .with('POST', () => post(event, todoService))
@@ -21,7 +14,7 @@ export const handler = async (
 };
 
 const post = (event: APIGatewayEvent, todoService: TodoService) =>
-  todoService.createTodo(JSON.parse(event.body ?? '{}')).caseOf({
+  todoService.create(JSON.parse(event.body ?? '{}')).caseOf({
     Left: () => ({
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
@@ -35,12 +28,15 @@ const post = (event: APIGatewayEvent, todoService: TodoService) =>
   });
 
 const get = (event: APIGatewayEvent, todoService: TodoService) =>
-  todoService.getTodo(event.pathParameters?.todoId ?? '').caseOf({
-    Left: () => ({
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'Internal Server Error' }),
-    }),
+  todoService.read(event.pathParameters?.todoId ?? '').caseOf({
+    Left: (error) => {
+      console.log(error);
+      return {
+        statusCode: 500,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Internal Server Error' }),
+      };
+    },
     Right: (todo) => ({
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
