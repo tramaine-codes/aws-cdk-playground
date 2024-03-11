@@ -53,7 +53,6 @@
     "constructs": "10.3.0",
     "date-fns": "3.3.1",
     "dotenv": "16.4.5",
-    "dynamodb-toolbox": "0.9.2",
     "env-var": "7.4.1",
     "got": "14.2.1",
     "nanoid": "5.0.6",
