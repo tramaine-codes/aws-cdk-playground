@@ -33,12 +33,12 @@ export class DynamoGateway {
   read = (id: string) =>
     this.client.query({
       TableName: this.config.aws.dynamo.tableName,
-      KeyConditionExpression: '#pk = :id',
+      KeyConditionExpression: '#pk = :pk',
       ExpressionAttributeNames: {
         '#pk': 'PK',
       },
       ExpressionAttributeValues: {
-        ':id': `TODO#${id}`,
+        ':pk': `TODO#${id}`,
       },
       Limit: 1,
       ScanIndexForward: true,
