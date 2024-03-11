@@ -29,14 +29,11 @@ const post = (event: APIGatewayEvent, todoService: TodoService) =>
 
 const get = (event: APIGatewayEvent, todoService: TodoService) =>
   todoService.read(event.pathParameters?.todoId ?? '').caseOf({
-    Left: (error) => {
-      console.log(error);
-      return {
-        statusCode: 500,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'Internal Server Error' }),
-      };
-    },
+    Left: () => ({
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'Internal Server Error' }),
+    }),
     Right: (todo) => ({
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
