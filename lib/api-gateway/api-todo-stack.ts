@@ -6,6 +6,8 @@ import * as kms from 'aws-cdk-lib/aws-kms';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
+import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import { Construct } from 'constructs';
 import { Package } from '../vendor/pkg/package.js';
 
@@ -71,8 +73,8 @@ export class ApiTodoStack extends cdk.Stack {
       })
     );
 
-    const handler = new nodejs.NodejsFunction(this, 'TodoHandler', {
-      entry: `${this.pkg.rootDir()}/lambda/todo-api/index.ts`,
+    const apiHandler = new nodejs.NodejsFunction(this, 'ApiHandler', {
+      entry: `${this.pkg.rootDir()}/lambda/todo/api/index.ts`,
       environment: {
         DYNAMODB_TABLE: table.tableName,
         KMS_KEY: key.keyArn,
@@ -81,10 +83,10 @@ export class ApiTodoStack extends cdk.Stack {
       handler: 'index.handler',
       runtime: lambda.Runtime.NODEJS_20_X,
     });
-    const integration = new apigw.LambdaIntegration(handler);
+    const integration = new apigw.LambdaIntegration(apiHandler);
 
-    table.grantReadWriteData(handler);
-    bucket.grantReadWrite(handler);
+    table.grantReadWriteData(apiHandler);
+    bucket.grantReadWrite(apiHandler);
 
     const api = new apigw.RestApi(this, 'TodoApi');
 
@@ -93,5 +95,28 @@ export class ApiTodoStack extends cdk.Stack {
 
     const todo = todos.addResource('{todoId}');
     todo.addMethod('GET', integration);
+
+    const middleHandler = new nodejs.NodejsFunction(this, 'MiddleHandler', {
+      entry: `${this.pkg.rootDir()}/lambda/todo/middle/index.ts`,
+      environment: {
+        DYNAMODB_TABLE: table.tableName,
+        KMS_KEY: key.keyArn,
+        S3_BUCKET: bucket.bucketName,
+      },
+      handler: 'index.handler',
+      runtime: lambda.Runtime.NODEJS_20_X,
+    });
+
+    const saveToDynamoJob = new tasks.LambdaInvoke(this, 'SaveToDynamoJob', {
+      lambdaFunction: middleHandler,
+    });
+
+    const stateMachine = new sfn.StateMachine(this, 'StateMachine', {
+      definitionBody: sfn.DefinitionBody.fromChainable(saveToDynamoJob),
+      timeout: cdk.Duration.minutes(5),
+      comment: 'a super cool state machine',
+    });
+
+    stateMachine.grantStartExecution(apiHandler);
   }
 }
