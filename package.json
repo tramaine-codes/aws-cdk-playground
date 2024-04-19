@@ -29,7 +29,7 @@
     "@typescript-eslint/eslint-plugin": "7.7.0",
     "@typescript-eslint/parser": "7.7.0",
     "@vitest/coverage-v8": "1.5.0",
-    "aws-cdk": "2.137.0",
+    "aws-cdk": "2.138.0",
     "del-cli": "5.1.0",
     "esbuild": "0.20.2",
     "eslint": "8.57.0",
@@ -43,13 +43,13 @@
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "3.556.0",
-    "@aws-sdk/client-ec2": "3.556.0",
+    "@aws-sdk/client-ec2": "3.557.0",
     "@aws-sdk/client-s3": "3.556.0",
     "@aws-sdk/credential-provider-node": "3.556.0",
     "@aws-sdk/lib-dynamodb": "3.556.0",
     "@opensearch-project/opensearch": "2.7.0",
     "@sindresorhus/is": "6.2.0",
-    "aws-cdk-lib": "2.137.0",
+    "aws-cdk-lib": "2.138.0",
     "constructs": "10.3.0",
     "date-fns": "3.6.0",
     "dotenv": "16.4.5",
@@ -58,7 +58,7 @@
     "nanoid": "5.0.7",
     "pkg-dir": "8.0.0",
     "purify-ts": "2.0.3",
-    "remeda": "1.59.0",
+    "remeda": "1.60.1",
     "source-map-support": "0.5.21",
     "ts-pattern": "5.1.1"
   }
