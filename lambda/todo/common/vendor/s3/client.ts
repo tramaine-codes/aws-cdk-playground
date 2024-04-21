@@ -58,9 +58,9 @@ export class Client {
     EitherAsync<Error, string>(async () => {
       const chunks = [new Uint8Array()];
       for await (const stream of payload) {
-        Maybe.fromNullable(stream.Records?.Payload).ifJust((chunk) =>
-          chunks.push(chunk)
-        );
+        Maybe.fromNullable(stream.Records)
+          .chainNullable(({ Payload }) => Payload)
+          .ifJust(chunks.push);
       }
       return Buffer.concat(chunks).toString('utf8');
     });
