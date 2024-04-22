@@ -118,5 +118,58 @@ export class ApiTodoStack extends cdk.Stack {
     });
 
     stateMachine.grantStartExecution(apiHandler);
+
+    const start = new sfn.Pass(this, 'JobOne', {
+      stateName: 'One',
+      parameters: {
+        id: 'foo',
+      },
+    })
+      .next(
+        new sfn.Pass(this, 'JobTwo', {
+          parameters: {
+            action: 'bar',
+            id: sfn.JsonPath.stringAt('$.id'),
+          },
+          stateName: 'Two',
+        })
+      )
+      .next(
+        new sfn.Parallel(this, 'JobThree', {
+          stateName: 'Parallel',
+        })
+          .branch(
+            new sfn.Pass(this, 'JobThreeA', {
+              parameters: {
+                action: 'baz',
+                id: sfn.JsonPath.stringAt('$.id'),
+              },
+              stateName: 'ThreeA',
+            })
+          )
+          .branch(
+            new sfn.Pass(this, 'JobThreeB', {
+              parameters: {
+                action: 'qux',
+                id: sfn.JsonPath.stringAt('$.id'),
+              },
+              stateName: 'ThreeB',
+            }).next(
+              new sfn.Pass(this, 'JobThreeBB', {
+                parameters: {
+                  action: 'quux',
+                  id: sfn.JsonPath.stringAt('$.id'),
+                },
+                stateName: 'ThreeBB',
+              })
+            )
+          )
+      );
+
+    new sfn.StateMachine(this, 'ParametersMachine', {
+      definitionBody: sfn.DefinitionBody.fromChainable(start),
+      timeout: cdk.Duration.minutes(5),
+      comment: 'a super cool state machine',
+    });
   }
 }
