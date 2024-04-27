@@ -24,9 +24,6 @@ export class StateMachineStack extends cdk.Stack {
     );
     choice.otherwise(baz);
 
-    // Use .afterwards() to join all possible paths back together and continue
-    // choice.afterwards().next(baz);
-
     new sfn.StateMachine(this, 'StateMachine', {
       definitionBody: sfn.DefinitionBody.fromChainable(parallel),
       timeout: cdk.Duration.minutes(5),
