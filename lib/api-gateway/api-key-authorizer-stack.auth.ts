@@ -1,4 +1,4 @@
-import {
+import type {
   APIGatewayAuthorizerResult,
   APIGatewayRequestAuthorizerEvent,
 } from 'aws-lambda';
@@ -18,6 +18,6 @@ export const handler = async (
         },
       ],
     },
-    usageIdentifierKey: event.headers!['x-api-key'],
+    usageIdentifierKey: event.headers?.['x-api-key'],
   };
 };

@@ -1,15 +1,15 @@
 import {
   GetObjectCommand,
-  GetObjectCommandInput,
-  GetObjectCommandOutput,
   PutObjectCommand,
-  PutObjectCommandInput,
-  PutObjectCommandOutput,
   S3Client,
   SelectObjectContentCommand,
-  SelectObjectContentCommandInput,
-  SelectObjectContentCommandOutput,
-  SelectObjectContentEventStream,
+  type GetObjectCommandInput,
+  type GetObjectCommandOutput,
+  type PutObjectCommandInput,
+  type PutObjectCommandOutput,
+  type SelectObjectContentCommandInput,
+  type SelectObjectContentCommandOutput,
+  type SelectObjectContentEventStream,
 } from '@aws-sdk/client-s3';
 import { EitherAsync, Left, Maybe } from 'purify-ts';
 import { match } from 'ts-pattern';

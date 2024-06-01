@@ -8,7 +8,7 @@ import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
 import { Package } from '../vendor/pkg/package.js';
 
 export class ApiTodoStack extends cdk.Stack {

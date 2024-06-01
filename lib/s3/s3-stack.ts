@@ -8,7 +8,7 @@ import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sqs from 'aws-cdk-lib/aws-sqs';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
 import { Package } from '../vendor/pkg/package.js';
 
 export class S3Stack extends cdk.Stack {

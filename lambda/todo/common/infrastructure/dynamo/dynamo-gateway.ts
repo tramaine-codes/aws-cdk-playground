@@ -1,8 +1,8 @@
 import { Nothing } from 'purify-ts';
-import { TodoDto } from '../../application/dto/todo-dto.js';
+import type { TodoDto } from '../../application/dto/todo-dto.js';
 import { Client } from '../../vendor/dynamo/client.js';
 import { Time } from '../../vendor/type/time.js';
-import { Config } from '../config/config.js';
+import type { Config } from '../config/config.js';
 
 export class DynamoGateway {
   constructor(

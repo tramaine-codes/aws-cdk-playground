@@ -1,4 +1,4 @@
-import { Todo } from '../model/todo.js';
+import type { Todo } from '../model/todo.js';
 
 export class TodoDto {
   constructor(

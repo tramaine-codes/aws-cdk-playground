@@ -4,7 +4,7 @@ import {
   EC2Client,
   StartInstancesCommand,
 } from '@aws-sdk/client-ec2';
-import { Context, SQSBatchResponse, SQSEvent } from 'aws-lambda';
+import type { Context, SQSBatchResponse, SQSEvent } from 'aws-lambda';
 import * as R from 'remeda';
 
 export const handler = async (
@@ -39,9 +39,9 @@ export const handler = async (
   const instanceIds = R.pipe(
     describeOutput.Reservations ?? [],
     R.flatMap(({ Instances }) => Instances),
-    R.compact,
+    R.filter(R.isTruthy),
     R.map(({ InstanceId }) => InstanceId),
-    R.compact
+    R.filter(R.isTruthy)
   );
 
   if (instanceIds.length > 0) {

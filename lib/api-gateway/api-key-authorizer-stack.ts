@@ -2,7 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as nodejs from 'aws-cdk-lib/aws-lambda-nodejs';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
 import { Package } from '../vendor/pkg/package.js';
 
 export class ApiKeyAuthorizerStack extends cdk.Stack {

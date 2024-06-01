@@ -2,11 +2,11 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,
   PutCommand,
-  PutCommandInput,
-  PutCommandOutput,
   QueryCommand,
-  QueryCommandInput,
-  QueryCommandOutput,
+  type PutCommandInput,
+  type PutCommandOutput,
+  type QueryCommandInput,
+  type QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
 import { EitherAsync } from 'purify-ts';
 

@@ -2,8 +2,8 @@ import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as es from 'aws-cdk-lib/aws-opensearchservice';
-import { Construct } from 'constructs';
-import { Environment } from '../infrastructure/environment/environment.js';
+import type { Construct } from 'constructs';
+import type { Environment } from '../infrastructure/environment/environment.js';
 
 interface OpenSearchStackProps extends cdk.StackProps {
   readonly environment: Environment;

@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as codebuild from 'aws-cdk-lib/aws-codebuild';
 import * as s3 from 'aws-cdk-lib/aws-s3';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
 
 export class CodeBuildStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {

@@ -27,7 +27,5 @@ export class Environment {
       .asString();
   }
 
-  static load() {
-    return new Environment();
-  }
+  static load = () => new Environment();
 }

@@ -1,7 +1,7 @@
 import { EitherAsync, List, Maybe } from 'purify-ts';
 import { TodoDto } from '../../../common/application/dto/todo-dto.js';
-import { Todo } from '../../../common/application/model/todo.js';
-import { Config } from '../../../common/infrastructure/config/config.js';
+import type { Todo } from '../../../common/application/model/todo.js';
+import type { Config } from '../../../common/infrastructure/config/config.js';
 import { DynamoGateway } from '../../../common/infrastructure/dynamo/dynamo-gateway.js';
 import { IdGenerator } from '../../../common/infrastructure/id/id-generator.js';
 import { S3Gateway } from '../../../common/infrastructure/s3/s3-gateway.js';

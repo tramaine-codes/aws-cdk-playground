@@ -82,6 +82,7 @@ export class OpenSearchGateway {
 }
 
 const gateway = OpenSearchGateway.from(Environment.load());
+
 // eslint-disable-next-line no-console
 console.log(
   await gateway.search({
@@ -100,6 +101,7 @@ console.log(
     ],
   })
 );
+
 // eslint-disable-next-line no-console
 console.log(
   await gateway.search({

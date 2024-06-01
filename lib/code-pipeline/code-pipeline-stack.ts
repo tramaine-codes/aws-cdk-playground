@@ -4,7 +4,7 @@ import * as codedeploy from 'aws-cdk-lib/aws-codedeploy';
 import * as codepipeline from 'aws-cdk-lib/aws-codepipeline';
 import * as codepipeline_actions from 'aws-cdk-lib/aws-codepipeline-actions';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
 
 export class CodePipelineStack extends cdk.Stack {
   constructor(

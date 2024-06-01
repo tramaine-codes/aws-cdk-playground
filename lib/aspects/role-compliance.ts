@@ -1,6 +1,6 @@
-import { IAspect } from 'aws-cdk-lib';
+import type { IAspect } from 'aws-cdk-lib';
 import { CfnRole } from 'aws-cdk-lib/aws-iam';
-import { IConstruct } from 'constructs';
+import type { IConstruct } from 'constructs';
 
 export class RoleCompliance implements IAspect {
   visit(node: IConstruct): void {

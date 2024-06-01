@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import got, { Got } from 'got';
+import got, { type Got } from 'got';
 import { EitherAsync } from 'purify-ts';
 import { Environment } from '../../infrastructure/environment/environment.js';
 
@@ -27,18 +27,17 @@ export class SecuritySettings {
       .chain(this.addReadAllIndexMappingsRole)
       .chain(this.addIndicesFullAccessRole);
 
-  private updateReadAllCusterMonitorRole = () => {
-    return EitherAsync(() =>
+  private updateReadAllCusterMonitorRole = () =>
+    EitherAsync(() =>
       this.request('_plugins/_security/api/rolesmapping/readall_and_monitor', {
         json: {
           users: [this.awsIamUser],
         },
       }).json()
     );
-  };
 
-  private addReadAllIndexMappingsRole = () => {
-    return EitherAsync(() =>
+  private addReadAllIndexMappingsRole = () =>
+    EitherAsync(() =>
       this.request('_plugins/_security/api/roles/index_mappings_readall', {
         json: {
           index_permissions: [
@@ -61,10 +60,9 @@ export class SecuritySettings {
         ).json()
       )
     );
-  };
 
-  private addIndicesFullAccessRole = () => {
-    return EitherAsync(() =>
+  private addIndicesFullAccessRole = () =>
+    EitherAsync(() =>
       this.request('_plugins/_security/api/roles/indices_full_access', {
         json: {
           cluster_permissions: ['indices:data/write/bulk'],
@@ -88,7 +86,6 @@ export class SecuritySettings {
         ).json()
       )
     );
-  };
 }
 
 const settings = new SecuritySettings(Environment.load());

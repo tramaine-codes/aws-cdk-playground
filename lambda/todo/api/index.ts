@@ -1,4 +1,4 @@
-import { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
+import type { APIGatewayEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { Maybe } from 'purify-ts';
 import { match } from 'ts-pattern';
 import { Config } from '../common/infrastructure/config/config.js';

@@ -1,5 +1,5 @@
-import { TodoDto } from '../../../common/application/dto/todo-dto.js';
-import { Config } from '../../../common/infrastructure/config/config.js';
+import type { TodoDto } from '../../../common/application/dto/todo-dto.js';
+import type { Config } from '../../../common/infrastructure/config/config.js';
 import { DynamoGateway } from '../../../common/infrastructure/dynamo/dynamo-gateway.js';
 import { S3Gateway } from '../../../common/infrastructure/s3/s3-gateway.js';
 

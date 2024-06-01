@@ -22,17 +22,16 @@ export class PayPeriodsIndex {
     this.index = `${PayPeriodsIndex.ALIAS}_${Time.now()}`;
   }
 
-  setup = () => {
-    return this.createIndex()
+  setup = () =>
+    this.createIndex()
       .chain(this.loadIndex)
       .chain(this.aliases)
       .chain(this.updateAlias)
       .chain(this.indices)
       .chain(this.cleanupIndices);
-  };
 
-  private createIndex = () => {
-    return EitherAsync(() =>
+  private createIndex = () =>
+    EitherAsync(() =>
       this.client.indices.create({
         index: this.index,
         body: {
@@ -63,10 +62,9 @@ export class PayPeriodsIndex {
         },
       })
     );
-  };
 
-  private loadIndex = () => {
-    return EitherAsync(() =>
+  private loadIndex = () =>
+    EitherAsync(() =>
       this.client.helpers.bulk({
         datasource: [
           {
@@ -190,22 +188,18 @@ export class PayPeriodsIndex {
             sequence: 20,
           },
         ],
-        onDocument: () => {
-          return { index: { _index: this.index } };
-        },
+        onDocument: () => ({ index: { _index: this.index } }),
       })
     );
-  };
 
-  private aliases = () => {
-    return EitherAsync(() =>
+  private aliases = () =>
+    EitherAsync(() =>
       this.client.cat.aliases<AliasesResponse>({
         name: PayPeriodsIndex.ALIAS,
         h: 'alias,index',
         format: 'json',
       })
     ).map(({ body }) => body);
-  };
 
   private updateAlias = (aliases: AliasesResponse) => {
     const removes = aliases.map(({ index, alias }) => ({
@@ -232,15 +226,14 @@ export class PayPeriodsIndex {
     );
   };
 
-  private indices = () => {
-    return EitherAsync(() =>
+  private indices = () =>
+    EitherAsync(() =>
       this.client.cat.indices<IndicesResponse>({
         index: `${PayPeriodsIndex.ALIAS}_2*`,
         h: 'index',
         format: 'json',
       })
     ).map(({ body }) => body.map(({ index }) => index));
-  };
 
   private cleanupIndices = (indices: readonly string[]) => {
     const sortedDesc: readonly string[] = [...indices].sort().reverse();
@@ -260,7 +253,7 @@ export class PayPeriodsIndex {
     );
   };
 
-  static from(environment: Environment) {
+  static from = (environment: Environment) => {
     const { awsRegion: region, openSearchDomain: node } = environment;
 
     return new PayPeriodsIndex(
@@ -273,21 +266,15 @@ export class PayPeriodsIndex {
         node,
       })
     );
-  }
+  };
 }
 
 class Time {
-  now() {
-    return format(Date.now(), 'yyyyMMddHHmmssSS');
-  }
+  now = () => format(Date.now(), 'yyyyMMddHHmmssSS');
 
-  static now() {
-    return Time.build().now();
-  }
+  static now = () => Time.build().now();
 
-  static build() {
-    return new Time();
-  }
+  static build = () => new Time();
 }
 
 const index = PayPeriodsIndex.from(Environment.load());

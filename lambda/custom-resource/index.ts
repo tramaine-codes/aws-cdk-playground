@@ -1,4 +1,4 @@
-import {
+import type {
   CdkCustomResourceEvent,
   CdkCustomResourceResponse,
   Context,
@@ -18,7 +18,7 @@ export const handler = async (
     PhysicalResourceId: context.logGroupName,
   };
 
-  if (event.RequestType == 'Delete') {
+  if (event.RequestType === 'Delete') {
     response.Status = 'SUCCESS';
     response.Data = { Result: 'None' };
     return response;

@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
 
 export class StateMachineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
