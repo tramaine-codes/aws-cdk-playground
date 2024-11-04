@@ -1,4 +1,6 @@
-module.exports = {
+import type { Config } from 'release-it';
+
+export default {
   git: {
     commitMessage: 'chore(release): release v${version}',
     commitArgs: ['-S'],
@@ -32,4 +34,4 @@ module.exports = {
       },
     },
   },
-};
+} satisfies Config;
