@@ -67,7 +67,7 @@ export class S3Stack extends cdk.Stack {
     const fn = new nodejs.NodejsFunction(this, 'Function', {
       entry: `${this.pkg.rootDir()}/lambda/ec2/index.ts`,
       handler: 'handler',
-      runtime: lambda.Runtime.NODEJS_LATEST,
+      runtime: lambda.Runtime.NODEJS_22_X,
       timeout: cdk.Duration.seconds(60),
     });
     fn.addEventSource(new SqsEventSource(queue));

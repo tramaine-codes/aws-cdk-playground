@@ -81,7 +81,7 @@ export class ApiTodoStack extends cdk.Stack {
         S3_BUCKET: bucket.bucketName,
       },
       handler: 'index.handler',
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
     });
     const integration = new apigw.LambdaIntegration(apiHandler);
 
@@ -104,7 +104,7 @@ export class ApiTodoStack extends cdk.Stack {
         S3_BUCKET: bucket.bucketName,
       },
       handler: 'index.handler',
-      runtime: lambda.Runtime.NODEJS_20_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
     });
 
     const saveToDynamoJob = new tasks.LambdaInvoke(this, 'SaveToDynamoJob', {

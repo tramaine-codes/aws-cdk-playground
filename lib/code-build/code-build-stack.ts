@@ -29,7 +29,7 @@ export class CodeBuildStack extends cdk.Stack {
         phases: {
           install: {
             'runtime-versions': {
-              nodejs: 16,
+              nodejs: 22,
             },
             commands: ['npm install -g npm@latest'],
           },
