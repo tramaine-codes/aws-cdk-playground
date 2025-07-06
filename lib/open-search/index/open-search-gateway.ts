@@ -24,7 +24,7 @@ export class OpenSearchGateway {
       })
     );
 
-  static from(environment: Environment) {
+  static from = (environment: Environment) => {
     const { awsRegion: region, openSearchDomain: node } = environment;
 
     return new OpenSearchGateway(
@@ -37,7 +37,7 @@ export class OpenSearchGateway {
         node,
       })
     );
-  }
+  };
 }
 
 const gateway = OpenSearchGateway.from(Environment.load());

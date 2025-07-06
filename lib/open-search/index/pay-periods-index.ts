@@ -268,9 +268,7 @@ export class PayPeriodsIndex {
 class Time {
   now = () => format(Date.now(), 'yyyyMMddHHmmssSS');
 
-  static now = () => Time.build().now();
-
-  static build = () => new Time();
+  static now = () => new Time().now();
 }
 
 const index = PayPeriodsIndex.from(Environment.load());
