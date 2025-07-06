@@ -17,12 +17,11 @@ export class PayPeriodsIndex {
 
   setup = () =>
     this.createIndex().pipe(
-      Effect.andThen(this.loadIndex),
-      Effect.andThen(this.loadIndex),
-      Effect.andThen(this.aliases),
-      Effect.andThen(this.updateAlias),
-      Effect.andThen(this.indices),
-      Effect.andThen(this.cleanupIndices)
+      Effect.andThen(() => this.loadIndex()),
+      Effect.andThen(() => this.aliases()),
+      Effect.andThen((aliases) => this.updateAlias(aliases)),
+      Effect.andThen(() => this.indices()),
+      Effect.andThen((indices) => this.cleanupIndices(indices))
     );
 
   private createIndex = () =>
@@ -274,4 +273,4 @@ class Time {
 const index = PayPeriodsIndex.from(Environment.load());
 
 // eslint-disable-next-line no-console
-console.log(await index.setup());
+console.log(await Effect.runPromise(index.setup()));

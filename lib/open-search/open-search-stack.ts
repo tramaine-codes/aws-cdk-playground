@@ -17,29 +17,30 @@ export class OpenSearchStack extends cdk.Stack {
       environment: { openSearchMasterUsername: masterUserName },
     } = props;
     const domain = new es.Domain(this, 'Domain', {
-      version: es.EngineVersion.openSearch('2.7'),
-      enableVersionUpgrade: true,
       capacity: {
         dataNodes: 2,
         dataNodeInstanceType: 't3.small.search',
         masterNodeInstanceType: 't3.small.search',
       },
-      zoneAwareness: {
-        availabilityZoneCount: 2,
-      },
-      enforceHttps: true,
-      nodeToNodeEncryption: true,
-      encryptionAtRest: {
-        enabled: true,
-      },
       ebs: {
         volumeSize: 20,
         volumeType: ec2.EbsDeviceVolumeType.GENERAL_PURPOSE_SSD,
       },
+      enableVersionUpgrade: true,
+      enforceHttps: true,
+      encryptionAtRest: {
+        enabled: true,
+      },
       fineGrainedAccessControl: {
         masterUserName,
       },
+      nodeToNodeEncryption: true,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+      tlsSecurityPolicy: es.TLSSecurityPolicy.TLS_1_2,
+      version: es.EngineVersion.openSearch('2.19'),
+      zoneAwareness: {
+        availabilityZoneCount: 2,
+      },
     });
 
     domain.addAccessPolicies(
