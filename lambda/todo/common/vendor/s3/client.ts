@@ -4,63 +4,59 @@ import {
   S3Client,
   SelectObjectContentCommand,
   type GetObjectCommandInput,
-  type GetObjectCommandOutput,
   type PutObjectCommandInput,
-  type PutObjectCommandOutput,
   type SelectObjectContentCommandInput,
   type SelectObjectContentCommandOutput,
   type SelectObjectContentEventStream,
 } from '@aws-sdk/client-s3';
-import { EitherAsync, Left, Maybe } from 'purify-ts';
-import { match } from 'ts-pattern';
+import { Effect, Match, Option } from 'effect';
 
 export class Client {
   private readonly client = new S3Client();
 
   get = (params: GetObjectCommandInput) =>
-    EitherAsync<Error, GetObjectCommandOutput>(() =>
-      this.client.send(new GetObjectCommand(params))
-    );
+    Effect.tryPromise(() => this.client.send(new GetObjectCommand(params)));
 
   put = (params: PutObjectCommandInput) =>
-    EitherAsync<Error, PutObjectCommandOutput>(() =>
-      this.client.send(new PutObjectCommand(params))
-    );
+    Effect.tryPromise(() => this.client.send(new PutObjectCommand(params)));
 
   select = (params: SelectObjectContentCommandInput) =>
-    EitherAsync<Error, SelectObjectContentCommandOutput>(() =>
+    Effect.tryPromise(() =>
       this.client.send(new SelectObjectContentCommand(params))
-    ).chain(this.selectOutput);
+    ).pipe(Effect.andThen(this.selectOutput));
 
   private selectOutput = ({
     $metadata: { httpStatusCode },
     Payload,
   }: SelectObjectContentCommandOutput) =>
-    match(httpStatusCode)
-      .with(200, () =>
-        EitherAsync.liftEither(
-          Maybe.fromNullable(Payload).toEither(new Error('Payload not found'))
-        ).chain(this.selectOutputPayload)
-      )
-      .otherwise((code) =>
-        EitherAsync.liftEither(
-          Left(
-            new Error(
-              `SelectObjectContentCommand failed with status code of ${code}`
-            )
+    Match.value(httpStatusCode).pipe(
+      Match.when(200, () =>
+        Effect.fromNullable(Payload).pipe(
+          Effect.catchTag('NoSuchElementException', () =>
+            Effect.fail(new Error('Payload not found'))
+          ),
+          Effect.andThen((payload) => this.selectOutputPayload(payload))
+        )
+      ),
+      Match.orElse((code) =>
+        Effect.fail(
+          new Error(
+            `SelectObjectContentCommand failed with status code of ${code}`
           )
         )
-      );
+      )
+    );
 
   private selectOutputPayload = (
     payload: AsyncIterable<SelectObjectContentEventStream>
   ) =>
-    EitherAsync<Error, string>(async () => {
+    Effect.tryPromise(async () => {
       const chunks = [new Uint8Array()];
       for await (const stream of payload) {
-        Maybe.fromNullable(stream.Records)
-          .chainNullable(({ Payload }) => Payload)
-          .ifJust(chunks.push);
+        Option.fromNullable(stream.Records).pipe(
+          Option.flatMapNullable(({ Payload }) => Payload),
+          Option.andThen((chunk) => chunks.push(chunk))
+        );
       }
       return Buffer.concat(chunks).toString('utf8');
     });

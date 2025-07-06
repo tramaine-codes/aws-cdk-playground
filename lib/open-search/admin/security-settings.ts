@@ -1,6 +1,6 @@
 import 'dotenv/config';
+import { Effect } from 'effect';
 import got, { type Got } from 'got';
-import { EitherAsync } from 'purify-ts';
 import { Environment } from '../../infrastructure/environment/environment.js';
 
 export class SecuritySettings {
@@ -23,12 +23,13 @@ export class SecuritySettings {
   }
 
   setup = () =>
-    this.updateReadAllCusterMonitorRole()
-      .chain(this.addReadAllIndexMappingsRole)
-      .chain(this.addIndicesFullAccessRole);
+    this.updateReadAllCusterMonitorRole().pipe(
+      Effect.andThen(this.addReadAllIndexMappingsRole),
+      Effect.andThen(this.addIndicesFullAccessRole)
+    );
 
   private updateReadAllCusterMonitorRole = () =>
-    EitherAsync(() =>
+    Effect.tryPromise(() =>
       this.request('_plugins/_security/api/rolesmapping/readall_and_monitor', {
         json: {
           users: [this.awsIamUser],
@@ -37,7 +38,7 @@ export class SecuritySettings {
     );
 
   private addReadAllIndexMappingsRole = () =>
-    EitherAsync(() =>
+    Effect.tryPromise(() =>
       this.request('_plugins/_security/api/roles/index_mappings_readall', {
         json: {
           index_permissions: [
@@ -48,21 +49,23 @@ export class SecuritySettings {
           ],
         },
       }).json()
-    ).chain(() =>
-      EitherAsync(() =>
-        this.request(
-          '_plugins/_security/api/rolesmapping/index_mappings_readall',
-          {
-            json: {
-              users: [this.awsIamUser],
-            },
-          }
-        ).json()
+    ).pipe(
+      Effect.andThen(() =>
+        Effect.tryPromise(() =>
+          this.request(
+            '_plugins/_security/api/rolesmapping/index_mappings_readall',
+            {
+              json: {
+                users: [this.awsIamUser],
+              },
+            }
+          ).json()
+        )
       )
     );
 
   private addIndicesFullAccessRole = () =>
-    EitherAsync(() =>
+    Effect.tryPromise(() =>
       this.request('_plugins/_security/api/roles/indices_full_access', {
         json: {
           cluster_permissions: ['indices:data/write/bulk'],
@@ -74,16 +77,18 @@ export class SecuritySettings {
           ],
         },
       }).json()
-    ).chain(() =>
-      EitherAsync(() =>
-        this.request(
-          '_plugins/_security/api/rolesmapping/indices_full_access',
-          {
-            json: {
-              users: [this.awsIamUser],
-            },
-          }
-        ).json()
+    ).pipe(
+      Effect.andThen(() =>
+        Effect.tryPromise(() =>
+          this.request(
+            '_plugins/_security/api/rolesmapping/indices_full_access',
+            {
+              json: {
+                users: [this.awsIamUser],
+              },
+            }
+          ).json()
+        )
       )
     );
 }

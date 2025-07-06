@@ -1,4 +1,4 @@
-import { Nothing } from 'purify-ts';
+import { Effect } from 'effect';
 import type { TodoDto } from '../../application/dto/todo-dto.js';
 import { Client } from '../../vendor/s3/client.js';
 import type { Config } from '../config/config.js';
@@ -18,7 +18,7 @@ export class S3Gateway {
         ServerSideEncryption: 'aws:kms',
         SSEKMSKeyId: this.config.aws.s3.key,
       })
-      .map(() => Nothing);
+      .pipe(Effect.andThen(Effect.void));
 
   read = (key: string, id: string) =>
     this.client.select({

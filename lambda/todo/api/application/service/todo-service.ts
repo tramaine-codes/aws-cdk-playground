@@ -1,4 +1,4 @@
-import { EitherAsync, List, Maybe } from 'purify-ts';
+import { Array as Arr, Effect } from 'effect';
 import { TodoDto } from '../../../common/application/dto/todo-dto.js';
 import type { Todo } from '../../../common/application/model/todo.js';
 import type { Config } from '../../../common/infrastructure/config/config.js';
@@ -16,31 +16,25 @@ export class TodoService {
     const id = IdGenerator.generate();
     const dto = new TodoDto(id, todo);
 
-    return this.s3Gateway
-      .create(dto)
-      .chain(() => this.dynamoGateway.create(dto))
-      .map(() => id);
+    return this.s3Gateway.create(dto).pipe(
+      Effect.andThen(this.dynamoGateway.create(dto)),
+      Effect.andThen(() => id)
+    );
   };
 
   read = (id: string) =>
-    this.dynamoGateway
-      .read(id)
-      .chain(({ Items }) =>
-        EitherAsync.liftEither(
-          Maybe.fromNullable(Items)
-            .chain((items) => List.at(0, items))
-            .toEither(new Error('item not found'))
-        )
-      )
-      .chain(({ S3Key }) =>
-        EitherAsync.liftEither(
-          Maybe.fromNullable<string>(S3Key).toEither(
-            new Error('s3key not found')
-          )
-        )
-      )
-      .chain((key) => this.s3Gateway.read(key, id))
-      .map((todo) => JSON.parse(todo) as TodoDto);
+    this.dynamoGateway.read(id).pipe(
+      Effect.andThen(({ Items }) => Effect.fromNullable(Items)),
+      Effect.catchTag('NoSuchElementException', () =>
+        Effect.fail(new Error('item not found'))
+      ),
+      Effect.andThen((items) => Arr.get(items, 0)),
+      Effect.catchTag('NoSuchElementException', () =>
+        Effect.fail(new Error('s3key not found'))
+      ),
+      Effect.andThen(({ S3Key }) => this.s3Gateway.read(S3Key, id)),
+      Effect.andThen((todo) => JSON.parse(todo) as TodoDto)
+    );
 
   static from = (config: Config) =>
     new TodoService(DynamoGateway.from(config), S3Gateway.from(config));

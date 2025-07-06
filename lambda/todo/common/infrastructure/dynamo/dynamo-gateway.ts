@@ -1,4 +1,4 @@
-import { Nothing } from 'purify-ts';
+import { Effect } from 'effect';
 import type { TodoDto } from '../../application/dto/todo-dto.js';
 import { Client } from '../../vendor/dynamo/client.js';
 import { Time } from '../../vendor/type/time.js';
@@ -27,7 +27,7 @@ export class DynamoGateway {
           TTL: ttl,
         },
       })
-      .map(() => Nothing);
+      .pipe(Effect.andThen(Effect.void));
   };
 
   read = (id: string) =>

@@ -1,17 +1,10 @@
 import { defaultProvider } from '@aws-sdk/credential-provider-node';
-import { Client } from '@opensearch-project/opensearch';
+import { Client, Types } from '@opensearch-project/opensearch';
 import { AwsSigv4Signer } from '@opensearch-project/opensearch/aws';
 import { format } from 'date-fns';
 import 'dotenv/config';
-import { EitherAsync, List, identity } from 'purify-ts';
+import { Array as Arr, Effect, Option, Predicate } from 'effect';
 import { Environment } from '../../infrastructure/environment/environment.js';
-
-interface Alias {
-  readonly alias: string;
-  readonly index: string;
-}
-type AliasesResponse = readonly Alias[];
-type IndicesResponse = readonly { readonly index: string }[];
 
 export class PayPeriodsIndex {
   private static readonly ALIAS = 'pay_periods';
@@ -23,15 +16,17 @@ export class PayPeriodsIndex {
   }
 
   setup = () =>
-    this.createIndex()
-      .chain(this.loadIndex)
-      .chain(this.aliases)
-      .chain(this.updateAlias)
-      .chain(this.indices)
-      .chain(this.cleanupIndices);
+    this.createIndex().pipe(
+      Effect.andThen(this.loadIndex),
+      Effect.andThen(this.loadIndex),
+      Effect.andThen(this.aliases),
+      Effect.andThen(this.updateAlias),
+      Effect.andThen(this.indices),
+      Effect.andThen(this.cleanupIndices)
+    );
 
   private createIndex = () =>
-    EitherAsync(() =>
+    Effect.tryPromise(() =>
       this.client.indices.create({
         index: this.index,
         body: {
@@ -64,7 +59,7 @@ export class PayPeriodsIndex {
     );
 
   private loadIndex = () =>
-    EitherAsync(() =>
+    Effect.tryPromise(() =>
       this.client.helpers.bulk({
         datasource: [
           {
@@ -193,31 +188,32 @@ export class PayPeriodsIndex {
     );
 
   private aliases = () =>
-    EitherAsync(() =>
-      this.client.cat.aliases<AliasesResponse>({
+    Effect.tryPromise(() =>
+      this.client.cat.aliases({
         name: PayPeriodsIndex.ALIAS,
-        h: 'alias,index',
         format: 'json',
       })
-    ).map(({ body }) => body);
+    ).pipe(Effect.andThen(({ body }) => body));
 
-  private updateAlias = (aliases: AliasesResponse) => {
-    const removes = aliases.map(({ index, alias }) => ({
+  private updateAlias = (
+    aliases: ReadonlyArray<Types.Cat_Aliases.AliasesRecord>
+  ) => {
+    const removes = aliases.map(({ alias, index }) => ({
       remove: {
-        index,
         alias,
+        index,
       },
     }));
 
-    return EitherAsync(() =>
+    return Effect.tryPromise(() =>
       this.client.indices.updateAliases({
         body: {
           actions: [
             ...removes,
             {
               add: {
-                index: this.index,
                 alias: PayPeriodsIndex.ALIAS,
+                index: this.index,
               },
             },
           ],
@@ -227,28 +223,28 @@ export class PayPeriodsIndex {
   };
 
   private indices = () =>
-    EitherAsync(() =>
-      this.client.cat.indices<IndicesResponse>({
+    Effect.tryPromise(() =>
+      this.client.cat.indices({
         index: `${PayPeriodsIndex.ALIAS}_2*`,
-        h: 'index',
         format: 'json',
       })
-    ).map(({ body }) => body.map(({ index }) => index));
+    ).pipe(
+      Effect.andThen(({ body }) => body.map(({ index }) => index)),
+      Effect.andThen((indices) => Arr.filter(indices, Predicate.isString))
+    );
 
-  private cleanupIndices = (indices: readonly string[]) => {
-    const sortedDesc: readonly string[] = [...indices].sort().reverse();
-    const oldIndices = List.tail(sortedDesc).caseOf({
-      Just: identity,
-      Nothing: () => [],
-    });
+  private cleanupIndices = (indices: ReadonlyArray<string>) => {
+    const sortedDesc: ReadonlyArray<string> = [...indices].sort().reverse();
+    const oldIndices = Arr.tail(sortedDesc).pipe(
+      Option.match({
+        onNone: () => [],
+        onSome: (indices) => indices,
+      })
+    );
 
-    return EitherAsync(() =>
-      Promise.all(
-        oldIndices.map((index) =>
-          this.client.indices.delete({
-            index,
-          })
-        )
+    return Effect.all(
+      oldIndices.map((index) =>
+        Effect.tryPromise(() => this.client.indices.delete({ index }))
       )
     );
   };
@@ -278,5 +274,6 @@ class Time {
 }
 
 const index = PayPeriodsIndex.from(Environment.load());
+
 // eslint-disable-next-line no-console
 console.log(await index.setup());

@@ -4,22 +4,16 @@ import {
   PutCommand,
   QueryCommand,
   type PutCommandInput,
-  type PutCommandOutput,
   type QueryCommandInput,
-  type QueryCommandOutput,
 } from '@aws-sdk/lib-dynamodb';
-import { EitherAsync } from 'purify-ts';
+import { Effect } from 'effect';
 
 export class Client {
   private readonly client = DynamoDBDocumentClient.from(new DynamoDBClient());
 
   query = (params: QueryCommandInput) =>
-    EitherAsync<Error, QueryCommandOutput>(() =>
-      this.client.send(new QueryCommand(params))
-    );
+    Effect.tryPromise(() => this.client.send(new QueryCommand(params)));
 
   put = (params: PutCommandInput) =>
-    EitherAsync<Error, PutCommandOutput>(() =>
-      this.client.send(new PutCommand(params))
-    );
+    Effect.tryPromise(() => this.client.send(new PutCommand(params)));
 }
