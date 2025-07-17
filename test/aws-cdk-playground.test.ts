@@ -5,7 +5,7 @@ import { test } from 'vitest';
 
 // example test. To run these tests, uncomment this file along with the
 // example resource in lib/aws-cdk-playground-stack.ts
-test('SQS Queue Created', () => {
+test('sqs queue created', () => {
   //   const app = new cdk.App();
   //     // WHEN
   //   const stack = new AwsCdkPlayground.AwsCdkPlaygroundStack(app, 'MyTestStack');
