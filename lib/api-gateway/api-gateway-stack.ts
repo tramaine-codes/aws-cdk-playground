@@ -9,7 +9,7 @@ export class ApiGatewayStack extends cdk.Stack {
 
     new apigw.LambdaRestApi(this, 'Endpoint', {
       handler: new lambda.Function(this, 'HelloHandler', {
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         code: lambda.Code.fromAsset('lambda/hello'),
         handler: 'hello.handler',
       }),

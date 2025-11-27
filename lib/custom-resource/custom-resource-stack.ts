@@ -51,7 +51,7 @@ class CustomResourceExample extends Construct {
         entry: `${this.pkg.rootDir()}/lambda/custom-resource/index.ts`,
         handler: 'handler',
         role: customResourceRole,
-        runtime: lambda.Runtime.NODEJS_22_X,
+        runtime: lambda.Runtime.NODEJS_24_X,
         timeout: cdk.Duration.seconds(60),
       }
     );

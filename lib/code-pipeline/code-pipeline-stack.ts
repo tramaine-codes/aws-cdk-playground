@@ -152,7 +152,7 @@ export class LambdaStack extends cdk.Stack {
     const func = new lambda.Function(this, 'Function', {
       code: this.lambdaCode,
       handler: 'lib/api/lambda.handler',
-      runtime: lambda.Runtime.NODEJS_22_X,
+      runtime: lambda.Runtime.NODEJS_24_X,
     });
 
     // used to make sure each CDK synthesis produces a different Version

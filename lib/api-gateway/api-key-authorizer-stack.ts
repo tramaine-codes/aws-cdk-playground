@@ -33,7 +33,7 @@ export class ApiKeyAuthorizerStack extends cdk.Stack {
       'GET',
       new apigw.LambdaIntegration(
         new lambda.Function(this, 'HelloHandler', {
-          runtime: lambda.Runtime.NODEJS_22_X,
+          runtime: lambda.Runtime.NODEJS_24_X,
           code: lambda.Code.fromAsset('lambda'),
           handler: 'hello.handler',
           environment: {
