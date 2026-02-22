@@ -1,3 +1,4 @@
+import { Effect } from 'effect';
 import type { TodoDto } from '../../../common/application/dto/todo-dto.js';
 import type { Config } from '../../../common/infrastructure/config/config.js';
 import { DynamoGateway } from '../../../common/infrastructure/dynamo/dynamo-gateway.js';
@@ -10,11 +11,11 @@ export class TodoService {
   ) {}
 
   create = (key: string, id: string) =>
-    this.s3Gateway
-      .read(key, id)
-      .map((todo) => JSON.parse(todo) as TodoDto)
-      .chain((dto) => this.dynamoGateway.create(dto))
-      .map(() => id);
+    this.s3Gateway.read(key, id).pipe(
+      Effect.andThen((todo) => JSON.parse(todo) as TodoDto),
+      Effect.andThen((dto) => this.dynamoGateway.create(dto)),
+      Effect.andThen(() => id)
+    );
 
   static from = (config: Config) =>
     new TodoService(DynamoGateway.from(config), S3Gateway.from(config));
