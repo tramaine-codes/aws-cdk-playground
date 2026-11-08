@@ -16,24 +16,23 @@ export class TodoService {
     const id = IdGenerator.generate();
     const dto = new TodoDto(id, todo);
 
-    return this.s3Gateway.create(dto).pipe(
-      Effect.andThen(this.dynamoGateway.create(dto)),
-      Effect.andThen(() => id)
-    );
+    return this.s3Gateway
+      .create(dto)
+      .pipe(Effect.andThen(this.dynamoGateway.create(dto)), Effect.as(id));
   };
 
   read = (id: string) =>
     this.dynamoGateway.read(id).pipe(
-      Effect.andThen(({ Items }) => Effect.fromNullable(Items)),
-      Effect.catchTag('NoSuchElementException', () =>
+      Effect.andThen(({ Items }) => Effect.fromNullishOr(Items)),
+      Effect.catchTag('NoSuchElementError', () =>
         Effect.fail(new Error('item not found'))
       ),
-      Effect.andThen((items) => Arr.get(items, 0)),
-      Effect.catchTag('NoSuchElementException', () =>
+      Effect.andThen((items) => Effect.fromOption(Arr.get(items, 0))),
+      Effect.catchTag('NoSuchElementError', () =>
         Effect.fail(new Error('s3key not found'))
       ),
       Effect.andThen(({ S3Key }) => this.s3Gateway.read(S3Key, id)),
-      Effect.andThen((todo) => JSON.parse(todo) as TodoDto)
+      Effect.map((todo) => JSON.parse(todo) as TodoDto)
     );
 
   static from = (config: Config) =>

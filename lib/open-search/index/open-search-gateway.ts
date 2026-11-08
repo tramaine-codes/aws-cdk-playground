@@ -15,7 +15,7 @@ export class OpenSearchGateway {
         body: params,
       })
     ).pipe(
-      Effect.andThen(({ body }) => {
+      Effect.map(({ body }) => {
         const {
           hits: { hits },
         } = body;

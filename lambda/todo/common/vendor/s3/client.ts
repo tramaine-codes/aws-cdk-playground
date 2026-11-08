@@ -31,8 +31,8 @@ export class Client {
   }: SelectObjectContentCommandOutput) =>
     Match.value(httpStatusCode).pipe(
       Match.when(200, () =>
-        Effect.fromNullable(Payload).pipe(
-          Effect.catchTag('NoSuchElementException', () =>
+        Effect.fromNullishOr(Payload).pipe(
+          Effect.catchTag('NoSuchElementError', () =>
             Effect.fail(new Error('Payload not found'))
           ),
           Effect.andThen((payload) => this.selectOutputPayload(payload))
@@ -56,16 +56,16 @@ export class Client {
     );
 
     return stream.pipe(
-      Stream.runFold(Chunk.empty<Uint8Array>(), (chunks, chunk) =>
-        Option.fromNullable(chunk.Records).pipe(
-          Option.flatMapNullable(({ Payload }) => Payload),
+      Stream.runFold(Chunk.empty<Uint8Array>, (chunks, chunk) =>
+        Option.fromNullishOr(chunk.Records).pipe(
+          Option.flatMapNullishOr(({ Payload }) => Payload),
           Option.match({
             onNone: () => chunks,
             onSome: (chunk) => chunks.pipe(Chunk.append(chunk)),
           })
         )
       ),
-      Effect.andThen((chunks) =>
+      Effect.map((chunks) =>
         Buffer.concat(chunks.pipe(Chunk.toReadonlyArray)).toString('utf8')
       )
     );

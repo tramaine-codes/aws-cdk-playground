@@ -19,7 +19,7 @@ export const handler = async (
 const post = ({ body }: APIGatewayEvent, todoService: TodoService) =>
   todoService
     .create(
-      JSON.parse(Option.fromNullable(body).pipe(Option.getOrElse(() => '{}')))
+      JSON.parse(Option.fromNullishOr(body).pipe(Option.getOrElse(() => '{}')))
     )
     .pipe(
       Effect.match({
@@ -39,8 +39,8 @@ const post = ({ body }: APIGatewayEvent, todoService: TodoService) =>
 const get = ({ pathParameters }: APIGatewayEvent, todoService: TodoService) =>
   todoService
     .read(
-      Option.fromNullable(pathParameters).pipe(
-        Option.flatMapNullable(({ todoId }) => todoId),
+      Option.fromNullishOr(pathParameters).pipe(
+        Option.flatMapNullishOr(({ todoId }) => todoId),
         Option.getOrElse(() => '')
       )
     )

@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib';
 import 'dotenv/config';
-import 'source-map-support/register';
 import { ApiGatewayStack } from '../lib/api-gateway/api-gateway-stack.js';
 import { ApiKeyAuthorizerStack } from '../lib/api-gateway/api-key-authorizer-stack.js';
 import { ApiKeyStack } from '../lib/api-gateway/api-key-stack.js';

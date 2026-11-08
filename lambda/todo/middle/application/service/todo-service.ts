@@ -12,9 +12,9 @@ export class TodoService {
 
   create = (key: string, id: string) =>
     this.s3Gateway.read(key, id).pipe(
-      Effect.andThen((todo) => JSON.parse(todo) as TodoDto),
+      Effect.map((todo) => JSON.parse(todo) as TodoDto),
       Effect.andThen((dto) => this.dynamoGateway.create(dto)),
-      Effect.andThen(() => id)
+      Effect.as(id)
     );
 
   static from = (config: Config) =>

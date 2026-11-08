@@ -192,7 +192,7 @@ export class PayPeriodsIndex {
         name: PayPeriodsIndex.ALIAS,
         format: 'json',
       })
-    ).pipe(Effect.andThen(({ body }) => body));
+    ).pipe(Effect.map(({ body }) => body));
 
   private updateAlias = (
     aliases: ReadonlyArray<Types.Cat_Aliases.AliasesRecord>
@@ -228,8 +228,8 @@ export class PayPeriodsIndex {
         format: 'json',
       })
     ).pipe(
-      Effect.andThen(({ body }) => body.map(({ index }) => index)),
-      Effect.andThen((indices) => Arr.filter(indices, Predicate.isString))
+      Effect.map(({ body }) => body.map(({ index }) => index)),
+      Effect.map((indices) => Arr.filter(indices, Predicate.isString))
     );
 
   private cleanupIndices = (indices: ReadonlyArray<string>) => {
