@@ -94,5 +94,5 @@ export class SecuritySettings {
 }
 
 const settings = new SecuritySettings(Environment.load());
-// eslint-disable-next-line no-console
+// biome-ignore lint/suspicious/noConsole: script prints results to the terminal
 console.log(await settings.setup());

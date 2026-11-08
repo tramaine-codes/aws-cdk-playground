@@ -8,7 +8,7 @@ export const handler = async (
   event: CdkCustomResourceEvent,
   context: Context
 ): Promise<CdkCustomResourceResponse> => {
-  // eslint-disable-next-line no-console
+  // biome-ignore lint/suspicious/noConsole: logs go to CloudWatch
   console.log(`Lambda is invoked with: ${JSON.stringify(event)}`);
 
   const response: CdkCustomResourceResponse = {

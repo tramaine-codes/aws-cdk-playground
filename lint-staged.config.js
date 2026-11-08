@@ -1,4 +1,4 @@
 export default {
-  '*.{js,json,ts,md}': 'prettier --write',
-  '*.{js,ts}': 'eslint --fix',
+  '*.{js,json,ts,md}':
+    'biome check --write --no-errors-on-unmatched --files-ignore-unknown=true',
 };

@@ -1,5 +1,5 @@
 import { defaultProvider } from '@aws-sdk/credential-provider-node';
-import { Client, Types } from '@opensearch-project/opensearch';
+import { Client, type Types } from '@opensearch-project/opensearch';
 import { AwsSigv4Signer } from '@opensearch-project/opensearch/aws';
 import { format } from 'date-fns';
 import 'dotenv/config';
@@ -272,5 +272,5 @@ class Time {
 
 const index = PayPeriodsIndex.from(Environment.load());
 
-// eslint-disable-next-line no-console
+// biome-ignore lint/suspicious/noConsole: script prints results to the terminal
 console.log(await Effect.runPromise(index.setup()));

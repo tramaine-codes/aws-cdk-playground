@@ -1,5 +1,5 @@
 export const handler = async (event) => {
-  // eslint-disable-next-line no-console
+  // biome-ignore lint/suspicious/noConsole: logs go to CloudWatch
   console.log('request:', JSON.stringify(event, undefined, 2));
 
   return {

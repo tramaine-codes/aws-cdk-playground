@@ -42,7 +42,7 @@ export class OpenSearchGateway {
 
 const gateway = OpenSearchGateway.from(Environment.load());
 
-// eslint-disable-next-line no-console
+// biome-ignore lint/suspicious/noConsole: script prints results to the terminal
 console.log(
   await Effect.runPromise(
     gateway.search({
@@ -63,7 +63,7 @@ console.log(
   )
 );
 
-// eslint-disable-next-line no-console
+// biome-ignore lint/suspicious/noConsole: script prints results to the terminal
 console.log(
   await Effect.runPromise(
     gateway.search({

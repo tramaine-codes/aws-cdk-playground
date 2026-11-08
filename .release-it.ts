@@ -1,3 +1,4 @@
+// biome-ignore-all lint/suspicious/noTemplateCurlyInString: release-it placeholders
 import type { Config } from 'release-it';
 
 export default {

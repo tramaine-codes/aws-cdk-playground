@@ -4,10 +4,10 @@ export const handler = async (
   event: Record<string, unknown>,
   context: Context
 ) => {
-  // eslint-disable-next-line no-console
+  // biome-ignore lint/suspicious/noConsole: logs go to CloudWatch
   console.log(event);
 
-  // eslint-disable-next-line no-console
+  // biome-ignore lint/suspicious/noConsole: logs go to CloudWatch
   console.log(JSON.stringify(context, undefined, 2));
 
   return {

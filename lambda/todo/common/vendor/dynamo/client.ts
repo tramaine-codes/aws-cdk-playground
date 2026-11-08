@@ -2,8 +2,8 @@ import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import {
   DynamoDBDocumentClient,
   PutCommand,
-  QueryCommand,
   type PutCommandInput,
+  QueryCommand,
   type QueryCommandInput,
 } from '@aws-sdk/lib-dynamodb';
 import { Effect } from 'effect';

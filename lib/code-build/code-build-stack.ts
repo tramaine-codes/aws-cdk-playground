@@ -45,6 +45,7 @@ export class CodeBuildStack extends cdk.Stack {
         },
         artifacts: {
           files: ['lib/**/*', 'package.json', 'node_modules/**/*'],
+          // biome-ignore lint/suspicious/noTemplateCurlyInString: expanded by CodeBuild
           name: 'geo-api-$(npm pkg get version | tr -d \\").${CODEBUILD_BUILD_NUMBER}.zip',
         },
       }),

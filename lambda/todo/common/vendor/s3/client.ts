@@ -1,10 +1,10 @@
 import {
   GetObjectCommand,
+  type GetObjectCommandInput,
   PutObjectCommand,
+  type PutObjectCommandInput,
   S3Client,
   SelectObjectContentCommand,
-  type GetObjectCommandInput,
-  type PutObjectCommandInput,
   type SelectObjectContentCommandInput,
   type SelectObjectContentCommandOutput,
   type SelectObjectContentEventStream,

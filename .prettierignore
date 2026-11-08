@@ -1,8 +1,0 @@
-/build
-bulk-movies.json
-/cdk.out
-/coverage
-/.husky
-/node_modules
-package-lock.json
-/tmp

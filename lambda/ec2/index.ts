@@ -1,4 +1,4 @@
-/* eslint-disable no-console */
+// biome-ignore-all lint/suspicious/noConsole: logs go to CloudWatch
 import {
   DescribeInstancesCommand,
   EC2Client,

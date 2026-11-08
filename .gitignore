@@ -1,7 +1,6 @@
 /coverage
 /build
 .env
-.eslintcache
 /node_modules
 /tmp
 
